@@ -62,7 +62,14 @@
 
   } Cylindre;
 
+  typedef struct {
 
+  	G3Xpoint vrtx[N*P];
+  	G3Xpoint norm[N*P];
+	G3Xcolor col; /*Couleur*/
+	double ambi, diff, spec, shine, alpha; /*materiau*/
+
+  } Tore;
 
 
   /*
@@ -124,6 +131,28 @@ Ressort * InitializeRessort(Ressort *str){
 			(*vt)[0]=(3*r+r*cos(j*a))*(cos(i*b));
 			(*vt)[1]=(3*r+r*cos(j*a))*sin(i*b);
 			(*vt)[2]=i*a+r*sin(j*a);
+			vt++;
+		}
+	}
+	return str;
+}
+Tore * InitializeTore(Tore *str){
+
+	int i,j;
+	double a=2*PI/N;
+  	double b=2*PI/P;/*double b=PI/P;*/
+	/*double r=1;*/
+	memset(str->vrtx, 0,N*P*sizeof(G3Xpoint));
+	memset(str->norm, 0,N*P*sizeof(G3Xvector));
+	G3Xpoint *vt=str->vrtx;
+	for(i=0;i<N;i++)
+	{
+
+		for (j=0;j<P;j++)
+		{
+			(*vt)[0]=(3*r+r*cos(j*a))*(cos(i*b));
+			(*vt)[1]=(3*r+r*cos(j*a))*sin(i*b);
+			(*vt)[2]=r*sin(j*a);
 			vt++;
 		}
 	}
@@ -330,9 +359,9 @@ void DrawSphere(Sphere * str){
 }
 
 
-void DrawTore(Ressort * str){
+void DrawRessort(Ressort * str){
 
-	int i,j,k,N2,P2;
+	int i,j,k;
 	i=0;
 	j=0;
 	k=0;
@@ -371,6 +400,50 @@ void DrawTore(Ressort * str){
 		}
 	}
 	glEnd();
+
+}
+void DrawTore(Tore * str){
+
+	int i,j,k;
+	i=0;
+	j=0;
+	k=0;
+	int n=100;
+	int p=100; 
+	int stepn=N/n; int stepp=P/p;
+
+	/*SQUELETTE TORE*/
+	glBegin(GL_POINTS);
+
+	for(i=0;i<N;i+=stepn){
+
+		for(j=0;j<P;j+=stepp){
+			k=i*P+j;
+			
+			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
+
+			glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
+
+		}
+
+	}
+	glEnd();
+
+	/*TEXTURE TORE*/
+	glBegin(GL_QUADS);
+
+	for(i=0;i<N-stepn;i+=stepn){
+		for(j=0;j<P;j+=stepp){
+			glVertex3dv(str->vrtx[i*N+j]);
+			glVertex3dv(str->vrtx[i*N+j+10]);
+			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
+			glVertex3dv(str->vrtx[(i+10)*N+j]);
+
+		}
+	}
+	glEnd();
+
 
 }
 
@@ -431,6 +504,9 @@ static Pave *ptr_p1=&p1;
 Cylindre c1;
 static Cylindre *ptr_c1=&c1;
 
+Tore t1;
+static Tore *ptr_t1=&t1;
+
 
 void Init(void){
 	memset(vrtx, 0,2*N*P*sizeof(G3Xpoint));
@@ -448,6 +524,7 @@ void Init(void){
 	InitializePave(ptr_p1);
 	InitializeSphere(ptr_s1);
 	InitializeCylindre(ptr_c1);
+	InitializeTore(ptr_t1);
 
 
 	g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
@@ -496,7 +573,7 @@ static void Dessin(void)
 
 	glTranslatef(0.,-5.,-1);
 	/* On dessine le Tore*/
-	DrawTore(ptr_r1);
+	DrawRessort(ptr_r1);
 
 
 	glPopMatrix();
@@ -513,6 +590,12 @@ static void Dessin(void)
 	glPushMatrix();
 	glTranslatef(5.,0.,-1);
 	DrawCylindre(ptr_c1);
+
+		glPopMatrix();
+	glPushMatrix();
+	glTranslatef(3.,3.,-1);
+	glScalef(0.3,.3,0.3);
+	DrawTore(ptr_t1);
 
 
 
