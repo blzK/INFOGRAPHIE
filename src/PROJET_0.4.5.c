@@ -31,6 +31,7 @@
   typedef struct Node{
   	struct Node * nodes;
   	struct Shape * shapes;
+  	int type;
   	int size;
   } Node;
 
@@ -463,7 +464,11 @@ void DrawCylindre(Shape * str){
 			glVertex3dv(str->vrtx[i*N+j+10]);
 			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
 			glVertex3dv(str->vrtx[(i+10)*N+j]);
-
+			/*glNormal3dv(str->norm[i*N+j]);
+			glNormal3dv(str->norm[i*N+j+10]);
+			glNormal3dv(str->norm[(i+10)*N+j+10]);
+			glNormal3dv(str->norm[(i+10)*N+j]);
+			*/
 		}
 	}
 	glEnd();
@@ -487,27 +492,46 @@ void DrawShape(Shape * str){
 		case 4:
 		DrawRessort(str);
 		break;
-
 	}
-	
 }
+
+void DrawLeaf(Node * str){
+	int i,size;
+	printf("Entering DrawLeaf\n");
+	size=(str->size);
+	printf("%d\n", size);
+	
+	printf("shapes \n");
+	for(i=0;i<size;i++){
+		DrawShape(&(str->shapes)[i]);
+	}
+}
+
 void DrawNodes(Node * str){
 	int i,size;
+	i=0;
 	size=str->size;
+	printf("Node %d\n",size );
 	if(str->shapes!=NULL){
-		for(i=0;i<size;i++){
-			DrawShape(&(str->shapes)[i]);
-		}
+		DrawLeaf(str);
 	}else if(str->nodes!=NULL){
-		Node *son=str->nodes;
-		while(son!=NULL){
-			son=son->nodes;
+		printf("Go to son \n");
+		Node *son;
+		son=(Node *)malloc(1*sizeof(Node));
+		son=&(str->nodes)[0];
+		i++;
+		while(son->type!=0){
+			son=&(son->nodes)[0];
+			printf("son num %d size %d\n",i, son->size);
+			i++;
 		}
-		DrawNodes(son);
-
+		/*printf("%d\n",son->size );*/
+		DrawLeaf(son);
 	}
-
 }
+
+
+
 Shape p1;
 static Shape *ptr_p1=&p1;
 
@@ -525,6 +549,8 @@ static Shape *ptr_r1=&r1;
 
 struct Node scene;
 struct Node *ptr_sc= &scene;
+struct Node n1;
+struct Node *ptr_n1= &n1;
 
 void Init(void){
 	p1.ID=0;
@@ -533,10 +559,6 @@ void Init(void){
 	t1.ID=3;
 	r1.ID=4;
 
-
-
-
-	
 	
 	InitializePave(ptr_p1);
 	InitializeSphere(ptr_s1);
@@ -546,14 +568,19 @@ void Init(void){
 
 
 /*initScene(ptr_sc);*/
-	ptr_sc->shapes=(Shape *)malloc(5*sizeof(Shape));
-	ptr_sc->size=5;
-	ptr_sc->shapes[0]=p1;
-	ptr_sc->shapes[1]=s1;
-	ptr_sc->shapes[2]=c1;
-	ptr_sc->shapes[3]=t1;
-	ptr_sc->shapes[4]=r1;
-
+	ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
+	ptr_n1->size=5;
+	ptr_n1->type=0;
+	ptr_n1->shapes[0]=p1;
+	ptr_n1->shapes[1]=s1;
+	ptr_n1->shapes[2]=c1;
+	ptr_n1->shapes[3]=t1;
+	ptr_n1->shapes[4]=r1;
+	
+	ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
+	ptr_sc->size=0;
+	ptr_sc->type=1;
+	ptr_sc->nodes[0]=n1;
 
 
 
@@ -584,7 +611,7 @@ static bool FLAG_ICOS  =true;
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
 {
-
+	DrawNodes(ptr_sc);
 	glPushMatrix();
 	glScalef(0.3,.3,0.3);
 	glTranslatef(0.,0.,-10);
@@ -629,11 +656,12 @@ static void Dessin(void)
 
 /* On dessine le Ressort*/
 	glTranslatef(0.,-5.,-1);
+	/*printf("%d\n",n1.size );*/
 	DrawShape(ptr_r1);
 
 
 	glTranslatef(-5.,-5.,-5);
-	DrawNodes(ptr_sc);
+
 
 
 
