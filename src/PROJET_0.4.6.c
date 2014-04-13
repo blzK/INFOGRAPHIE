@@ -508,85 +508,87 @@ void DrawLeaf(Node * str){
 }
 
 void DrawNodes(Node * str){
-	int i,size;
-	i=0;
-	size=str->size;
-	printf("Node %d\n",size );
-	if(str->shapes!=NULL){
-		DrawLeaf(str);
-	}else if(str->nodes!=NULL){
-		printf("Go to son \n");
-		Node *son;
-		son=(Node *)malloc(1*sizeof(Node));
-		son=&(str->nodes)[0];
-		i++;
-		while(son->type!=0){
-			son=&(son->nodes)[0];
-			printf("son num %d size %d\n",i, son->size);
-			i++;
-		}
-		/*printf("%d\n",son->size );*/
-		DrawLeaf(son);
-	}
-}
-
-
-
-Shape p1;
-static Shape *ptr_p1=&p1;
-
-Shape s1;
-static Shape *ptr_s1=&s1;
-
-Shape c1;
-static Shape *ptr_c1=&c1;
-
-Shape t1;
-static Shape *ptr_t1=&t1;
-
-Shape r1;
-static Shape *ptr_r1=&r1;
-
-struct Node scene;
-struct Node *ptr_sc= &scene;
-struct Node n1;
-struct Node *ptr_n1= &n1;
-
-void Init(void){
-	p1.ID=0;
-	s1.ID=1;
-	c1.ID=2;
-	t1.ID=3;
-	r1.ID=4;
-
+	int size,i;
 	
-	InitializePave(ptr_p1);
-	InitializeSphere(ptr_s1);
-	InitializeCylindre(ptr_c1);
-	InitializeTore(ptr_t1);
-	InitializeRessort(ptr_r1);
+	size=str->size;
+	printf("I'm a Node my size is %d my type is %d\n",size, str->type );
+	if(str->type==0){
+	/*if(str->shapes!=NULL){*/
+		printf("I'm a leaf %d\n",size );
+		DrawLeaf(str);
+	}
+	else if(str->type==1){/*Si c'est un noeud*/
+	printf("Go to son \n");
+	Node *son;
+	for(i=0;i<(str->size);i++){
+		printf("test\n");
+		son=&((str->nodes)[i]);
+		printf("looking son  %d type %d\n", i, son->type );
+		DrawNodes(son);
+
+			}
+		}
+	}
+
+	void exploreTree(){
+
+	}
+
+	Shape p1;
+	static Shape *ptr_p1=&p1;
+
+	Shape s1;
+	static Shape *ptr_s1=&s1;
+
+	Shape c1;
+	static Shape *ptr_c1=&c1;
+
+	Shape t1;
+	static Shape *ptr_t1=&t1;
+
+	Shape r1;
+	static Shape *ptr_r1=&r1;
+
+	struct Node scene;
+	struct Node *ptr_sc= &scene;
+	struct Node n1;
+	struct Node *ptr_n1= &n1;
+
+	void Init(void){
+		p1.ID=0;
+		s1.ID=1;
+		c1.ID=2;
+		t1.ID=3;
+		r1.ID=4;
+
+
+		InitializePave(ptr_p1);
+		InitializeSphere(ptr_s1);
+		InitializeCylindre(ptr_c1);
+		InitializeTore(ptr_t1);
+		InitializeRessort(ptr_r1);
 
 
 /*initScene(ptr_sc);*/
-	ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
-	ptr_n1->size=5;
-	ptr_n1->type=0;
-	ptr_n1->shapes[0]=p1;
-	ptr_n1->shapes[1]=s1;
-	ptr_n1->shapes[2]=c1;
-	ptr_n1->shapes[3]=t1;
-	ptr_n1->shapes[4]=r1;
-	
-	ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
-	ptr_sc->size=0;
-	ptr_sc->type=1;
-	ptr_sc->nodes[0]=n1;
+		ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
+		ptr_n1->size=5;
+		ptr_n1->type=0;
+		ptr_n1->shapes[0]=p1;
+		ptr_n1->shapes[1]=s1;
+		ptr_n1->shapes[2]=c1;
+		ptr_n1->shapes[3]=t1;
+		ptr_n1->shapes[4]=r1;
+
+		ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
+		ptr_sc->size=1;
+		ptr_sc->type=1;
+		ptr_sc->nodes[0]=n1;
 
 
 
-	g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
-	g3x_CreateScrollv_i("p",&p,3,P,1.0," ");
-	g3x_CreateScrollh_d("r",&r,0.1,10.,1.," ");
+		g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
+		g3x_CreateScrollv_i("p",&p,3,P,1.0," ");
+		g3x_CreateScrollh_d("r",&r,0.1,10.,1.," ");
 
 
 /*type de scroll 
@@ -611,9 +613,10 @@ static bool FLAG_ICOS  =true;
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
 {
-	DrawNodes(ptr_sc);
+	
 	glPushMatrix();
 	glScalef(0.3,.3,0.3);
+	DrawNodes(ptr_sc);
 	glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.);
 	g3x_Material(rouge,ambi,diff,spec,shin,1.);
@@ -630,38 +633,38 @@ static void Dessin(void)
 
 
 /* On dessine la sphere*/
-	glPopMatrix();
+/*	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(3.,0.,-1);
 	DrawShape(ptr_s1);
 
 /* On dessine le Pave*/
-	glPopMatrix();
+/*	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(-3.,0.,-1);
 	DrawShape(ptr_p1);
 
 /* On dessine le Cylindre*/
-	glPopMatrix();
+/*	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(5.,0.,-1);
 	DrawShape(ptr_c1);
 
 /* On dessine le Tore*/
-	glPopMatrix();
+/*	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(3.,3.,-1);
 	glScalef(0.3,.3,0.3);
 	DrawShape(ptr_t1);
 
 /* On dessine le Ressort*/
-	glTranslatef(0.,-5.,-1);
+/*	glTranslatef(0.,-5.,-1);
 	/*printf("%d\n",n1.size );*/
-	DrawShape(ptr_r1);
+/*	DrawShape(ptr_r1);
 
 
 	glTranslatef(-5.,-5.,-5);
-
+*/
 
 
 
