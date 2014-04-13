@@ -29,7 +29,7 @@
 
 
   typedef struct Node{
-
+  	struct Node * nodes;
   	struct Shape * shapes;
   	int size;
   } Node;
@@ -494,8 +494,17 @@ void DrawShape(Shape * str){
 void DrawNodes(Node * str){
 	int i,size;
 	size=str->size;
-	for(i=0;i<size;i++){
-		DrawShape(&(str->shapes)[i]);
+	if(str->shapes!=NULL){
+		for(i=0;i<size;i++){
+			DrawShape(&(str->shapes)[i]);
+		}
+	}else if(str->nodes!=NULL){
+		Node *son=str->nodes;
+		while(son!=NULL){
+			son=son->nodes;
+		}
+		DrawNodes(son);
+
 	}
 
 }
