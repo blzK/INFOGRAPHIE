@@ -71,8 +71,8 @@ static double rayon= 0.66;
 static double alpha= 0.5;
 static double ambi = 0.4;
 static double diff = 0.2;
-static double spec = 0.4;
-static double shin = 0.5;
+static double spec = 1;/*0.4;*/
+static double shin = 1;/*0.5;*/
 
 
 #define MAXCOL 25
@@ -118,14 +118,26 @@ Shape * InitializeTore(Shape *str){
 	memset(str->vrtx, 0,N*P*sizeof(G3Xpoint));
 	memset(str->norm, 0,N*P*sizeof(G3Xvector));
 	G3Xpoint *vt=str->vrtx;
-	for(i=0;i<N;i++)
+	G3Xvector *vn=str->norm;
+	G3Xpoint *ptemp[4];
+
+
+	for(i=0;i<=N;i++)
 	{
 
-		for (j=0;j<P;j++)
+		for (j=0;j<=P;j++)
 		{
 			(*vt)[0]=(3*r+r*cos(j*a))*(cos(i*b));
 			(*vt)[1]=(3*r+r*cos(j*a))*sin(i*b);
 			(*vt)[2]=r*sin(j*a);
+
+			ptemp[i%4]=vt;
+
+			if(i%4==0){
+				
+				G3Xprodvect3point((*vn),(*ptemp)[0],(*ptemp)[1],(*ptemp)[2]);
+				vn++;
+			}
 			vt++;
 		}
 	}
@@ -145,10 +157,10 @@ Shape * InitializeSphere(Shape * str){
 	memset(str->vrtx, 20,N*P*sizeof(G3Xpoint));
 	memset(str->norm, 20,N*P*sizeof(G3Xvector));
 	G3Xpoint *vt=str->vrtx;
-	for(i=0;i<N;i++)
+	for(i=0;i<=N;i++)
 	{
 
-		for (j=0;j<P;j++)
+		for (j=0;j<=P;j++)
 		{
 			(*vt)[0]=r*cos(i*a)*sin(j*b);
 			(*vt)[1]=r*sin(i*a)*sin(j*b);
@@ -170,17 +182,38 @@ Shape * InitializeCylindre(Shape * str){
 	memset(str->vrtx, 20,N*P*sizeof(G3Xpoint));
 	memset(str->norm, 20,N*P*sizeof(G3Xvector));
 	G3Xpoint *vt=str->vrtx;
-	for(i=0;i<N;i++)
+	G3Xvector *vn=str->norm;
+	double ptemp[3];
+	/*(*ptemp)=malloc(3*sizeof(double));*/
+	
+	for(i=0;i<=N;i++)
 	{
 
-		for (j=0;j<P;j++)
+		for (j=0;j<=P;j++)
 		{
+
 			(*vt)[0]=r*cos(i*a);
 			(*vt)[1]=r*sin(i*a);
-			(*vt)[2]=j*b;
+			(*vt)[2]=j*b;	
+/*
+			ptemp[j%4]=vt;
 
+
+			if(j%4==0){
+
+					int e;
+				for(e=0;e<4;e++){
+					printf("normales %f %f %f\n", ptemp[0][0],ptemp[1][0],ptemp[2][0]);
+				}
+			/*	G3Xprodvect3point((*vn),(ptemp)[0],(ptemp)[1],(ptemp)[2]);
+				G3Xmulvect((*vn),-1) ;
+			*/
+				
+				/*vn++;
+			}*/
 			vt++;
 		}
+
 	}
 	return str;
 }
@@ -249,8 +282,7 @@ void DrawPave(Shape * str){
 	i=0;
 	j=0;
 	k=0;
-	int n=100;
-	int p=100; 
+
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE PAVE*/
@@ -261,7 +293,7 @@ void DrawPave(Shape * str){
 
 		for(j=0;j<4;j++){
 			glVertex3dv(str->vrtx[i*3+j]);
-			glNormal3dv(str->vrtx[i*3+j]);
+
 		}
 	}
 	glEnd();
@@ -298,8 +330,7 @@ void DrawSphere(Shape * str){
 	i=0;
 	j=0;
 	k=0;
-	int n=100;
-	int p=100; 
+
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE SPHERE*/
@@ -313,7 +344,7 @@ void DrawSphere(Shape * str){
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
 			glVertex3dv(str->vrtx[k]);
-			glNormal3dv(str->norm[k]);
+
 
 		}
 
@@ -326,9 +357,14 @@ void DrawSphere(Shape * str){
 	for(i=0;i<N;i+=stepn){
 		for(j=0;j<P;j+=stepp){
 			glVertex3dv(str->vrtx[i*N+j]);
-			glVertex3dv(str->vrtx[i*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j]);
+			glVertex3dv(str->vrtx[i*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j]);
+
+			glNormal3dv(str->norm[i*N+j]);
+			glNormal3dv(str->norm[i*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j]);
 
 		}
 
@@ -345,8 +381,7 @@ void DrawRessort(Shape * str){
 	i=0;
 	j=0;
 	k=0;
-	int n=100;
-	int p=100; 
+
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE RESSORT*/
@@ -360,7 +395,7 @@ void DrawRessort(Shape * str){
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
 			glVertex3dv(str->vrtx[k]);
-			glNormal3dv(str->norm[k]);
+
 
 		}
 
@@ -373,9 +408,14 @@ void DrawRessort(Shape * str){
 	for(i=0;i<2*N-stepn;i+=stepn){
 		for(j=0;j<P;j+=stepp){
 			glVertex3dv(str->vrtx[i*N+j]);
-			glVertex3dv(str->vrtx[i*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j]);
+			glVertex3dv(str->vrtx[i*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j]);
+
+			glNormal3dv(str->norm[i*N+j]);
+			glNormal3dv(str->norm[i*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j]);
 
 		}
 	}
@@ -388,8 +428,7 @@ void DrawTore(Shape * str){
 	i=0;
 	j=0;
 	k=0;
-	int n=100;
-	int p=100; 
+
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE TORE*/
@@ -403,7 +442,7 @@ void DrawTore(Shape * str){
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
 			glVertex3dv(str->vrtx[k]);
-			glNormal3dv(str->norm[k]);
+
 
 		}
 
@@ -413,15 +452,31 @@ void DrawTore(Shape * str){
 	/*TEXTURE TORE*/
 	glBegin(GL_QUADS);
 
-	for(i=0;i<N-stepn;i+=stepn){
+	for(i=0;i<N;i+=stepn){
 		for(j=0;j<P;j+=stepp){
 			glVertex3dv(str->vrtx[i*N+j]);
-			glVertex3dv(str->vrtx[i*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j]);
+			glVertex3dv(str->vrtx[i*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j]);
+
+			glNormal3dv(str->norm[i*N+j]);
+			glNormal3dv(str->norm[i*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j]);
 
 		}
 	}
+	glColor4fv(rouge);
+	g3x_Material(rouge,ambi,diff,spec,shin,1.);
+	i=0;
+
+	for(j=0;j<P;j+=stepp){
+		glVertex3dv(str->vrtx[N*P+j]);
+		glVertex3dv(str->vrtx[N*P+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j]);
+	}
+
 	glEnd();
 
 
@@ -433,8 +488,8 @@ void DrawCylindre(Shape * str){
 	i=0;
 	j=0;
 	k=0;
-	int n=100;
-	int p=100; 
+	/*int n=100;
+	int p=100; */
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE TORE*/
@@ -443,53 +498,73 @@ void DrawCylindre(Shape * str){
 	for(i=0;i<N;i+=stepn){
 
 		for(j=0;j<P;j+=stepp){
-			k=i*P+j;
+			k=i*N+j;
 			
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
 			glVertex3dv(str->vrtx[k]);
-			glNormal3dv(str->norm[k]);
+
 
 		}
 
 	}
 	glEnd();
 
-	/*TEXTURE TORE*/
+	/*TEXTURE CYLINDRE*/
 	glBegin(GL_QUADS);
-
+	
 	for(i=0;i<N;i+=stepn){
 		for(j=0;j<P;j+=stepp){
 			glVertex3dv(str->vrtx[i*N+j]);
-			glVertex3dv(str->vrtx[i*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j+10]);
-			glVertex3dv(str->vrtx[(i+10)*N+j]);
-			/*glNormal3dv(str->norm[i*N+j]);
-			glNormal3dv(str->norm[i*N+j+10]);
-			glNormal3dv(str->norm[(i+10)*N+j+10]);
-			glNormal3dv(str->norm[(i+10)*N+j]);
-			*/
+			glVertex3dv(str->vrtx[i*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j+stepp]);
+			glVertex3dv(str->vrtx[(i+stepn)*N+j]);
+			glNormal3dv(str->norm[i*N+j]);
+			glNormal3dv(str->norm[i*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j+stepp]);
+			glNormal3dv(str->norm[(i+stepn)*N+j]);
+			
 		}
+
 	}
+
+	glColor4fv(rouge);
+	g3x_Material(vert,ambi,diff,spec,shin,1.);
+	i=0;
+
+	for(j=0;j<P;j+=stepp){
+		glVertex3dv(str->vrtx[N*P+j]);
+		glVertex3dv(str->vrtx[N*P+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j]);
+	}
+
+
 	glEnd();
 
 }
 
 void DrawShape(Shape * str){
+	glColor4fv(orange);
 	switch (str->ID){
 		case 0:
+		g3x_Material(vert,ambi,diff,spec,shin,1.);
 		DrawPave(str);
 		break;
 		case 1:
+		g3x_Material(rouge,ambi,diff,spec,shin,1.);
 		DrawSphere(str);
 		break;
 		case 2:
+		g3x_Material(orange,ambi,diff,spec,shin,1.);
 		DrawCylindre(str);
 		break;
 		case 3:
+		g3x_Material(jaune,ambi,diff,spec,shin,1.);
 		DrawTore(str);
 		break;
 		case 4:
+		g3x_Material(cyan,ambi,diff,spec,shin,1.);
 		DrawRessort(str);
 		break;
 	}
@@ -513,7 +588,6 @@ void DrawNodes(Node * str){
 	size=str->size;
 	printf("I'm a Node my size is %d my type is %d\n",size, str->type );
 	if(str->type==0){
-	/*if(str->shapes!=NULL){*/
 		printf("I'm a leaf %d\n",size );
 		DrawLeaf(str);
 	}
@@ -526,69 +600,97 @@ void DrawNodes(Node * str){
 		printf("looking son  %d type %d\n", i, son->type );
 		DrawNodes(son);
 
-			}
+	}
+}
+}
+
+Shape * test(Shape * s){
+	float r,x,y,z,theta,phi,i,j;
+	float t;	
+	
+	int n=4;
+	G3Xpoint *vt=s->vrtx;
+	for(i=0;i<N;i++){
+
+		for (j=0;j<P;j++)
+		{
+			/*t= pow(r,n)*sin(theta*n)*cos(phi*n);*/
+
+			r = sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] +(*vt)[2]*(*vt)[2]);
+			theta = atan2(sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] ) , (*vt)[2]);
+			phi = atan2((*vt)[1],(*vt)[0]);
+			/*printf("\n %d %d %d %d %d ",t,r ,n, theta,phi);*/
+			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
+			(*vt)[0] = pow(r,n) * sin(theta*n) * cos(phi*n);
+			(*vt)[1] = pow(r,n) * sin(theta*n) * sin(phi*n);
+			(*vt)[2] = pow(r,n) * cos(theta*n);
+			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
+			vt++;
 		}
 	}
 
-	void exploreTree(){
+	return s;
+}
 
-	}
+void exploreTree(){
 
-	Shape p1;
-	static Shape *ptr_p1=&p1;
+}
 
-	Shape s1;
-	static Shape *ptr_s1=&s1;
+Shape p1;
+static Shape *ptr_p1=&p1;
 
-	Shape c1;
-	static Shape *ptr_c1=&c1;
+Shape s1;
+static Shape *ptr_s1=&s1;
 
-	Shape t1;
-	static Shape *ptr_t1=&t1;
+Shape c1;
+static Shape *ptr_c1=&c1;
 
-	Shape r1;
-	static Shape *ptr_r1=&r1;
+Shape t1;
+static Shape *ptr_t1=&t1;
 
-	struct Node scene;
-	struct Node *ptr_sc= &scene;
-	struct Node n1;
-	struct Node *ptr_n1= &n1;
+Shape r1;
+static Shape *ptr_r1=&r1;
 
-	void Init(void){
-		p1.ID=0;
-		s1.ID=1;
-		c1.ID=2;
-		t1.ID=3;
-		r1.ID=4;
+struct Node scene;
+struct Node *ptr_sc= &scene;
+struct Node n1;
+struct Node *ptr_n1= &n1;
+
+void Init(void){
+	p1.ID=0;
+	s1.ID=1;
+	c1.ID=2;
+	t1.ID=3;
+	r1.ID=4;
 
 
-		InitializePave(ptr_p1);
-		InitializeSphere(ptr_s1);
-		InitializeCylindre(ptr_c1);
-		InitializeTore(ptr_t1);
-		InitializeRessort(ptr_r1);
+	InitializePave(ptr_p1);
+	InitializeSphere(ptr_s1);
+	InitializeCylindre(ptr_c1);
+	InitializeTore(ptr_t1);
+	InitializeRessort(ptr_r1);
 
 
 /*initScene(ptr_sc);*/
-		ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
-		ptr_n1->size=5;
-		ptr_n1->type=0;
-		ptr_n1->shapes[0]=p1;
-		ptr_n1->shapes[1]=s1;
-		ptr_n1->shapes[2]=c1;
-		ptr_n1->shapes[3]=t1;
-		ptr_n1->shapes[4]=r1;
+	ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
+	ptr_n1->size=5;
+	ptr_n1->type=0;
+	ptr_n1->shapes[0]=p1;
+	ptr_n1->shapes[1]=s1;
+	ptr_n1->shapes[2]=c1;
+	ptr_n1->shapes[3]=t1;
+	ptr_n1->shapes[4]=r1;
 
-		ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
-		ptr_sc->size=1;
-		ptr_sc->type=1;
-		ptr_sc->nodes[0]=n1;
+	ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
+	ptr_sc->size=1;
+	ptr_sc->type=1;
+	ptr_sc->nodes[0]=n1;
 
 
 
-		g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
-		g3x_CreateScrollv_i("p",&p,3,P,1.0," ");
-		g3x_CreateScrollh_d("r",&r,0.1,10.,1.," ");
+	g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
+	g3x_CreateScrollv_i("p",&p,3,P,1.0," ");
+	g3x_CreateScrollh_d("r",&r,0.1,10.,1.," ");
 
 
 /*type de scroll 
@@ -612,20 +714,21 @@ static bool FLAG_ICOS  =true;
 
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
-{
+{	
+	glEnable(GL_LIGHTING);
 	
 	glPushMatrix();
-	glScalef(0.3,.3,0.3);
+	glScalef(0.7,.7,0.7);
 	DrawNodes(ptr_sc);
 	glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.);
 	g3x_Material(rouge,ambi,diff,spec,shin,1.);
 	int stepn=N/n, stepp=P/p;
 	int i,j;
-	/*glDisable(GL_LIGHTING);*/
+
 	glPointSize(r);
 	glColor4fv(rouge);
-	/*glEnable(GL_LIGHTING);*/
+	
 	int k;
 
 	glColor4fv(orange);
@@ -633,11 +736,14 @@ static void Dessin(void)
 
 
 /* On dessine la sphere*/
-/*	glPopMatrix();
+	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(3.,0.,-1);
-	DrawShape(ptr_s1);
+	/*test(ptr_s1);
+	test(ptr_s1);test(ptr_s1);test(ptr_s1);test(ptr_s1);test(ptr_s1);test(ptr_s1);test(ptr_s1);test(ptr_s1);
 
+	DrawShape(ptr_s1);
+*/
 /* On dessine le Pave*/
 /*	glPopMatrix();
 	glPushMatrix();
@@ -717,14 +823,14 @@ int main(int argc, char** argv)
 
   /* fixe les param. colorimétriques du spot lumineux */
 	/* lumiere blanche (c'est les valeurs par defaut)   */	
-	g3x_SetLightAmbient (1.,1.,1.);
+	g3x_SetLightAmbient (1,1.,1.);
 	g3x_SetLightDiffuse (1.,1.,1.);
 	g3x_SetLightSpecular(1.,1.,1.);
 
   /* fixe la position et la direction du spot lumineux */
 	/* (c'est les valeurs par defaut)                    */	
 	g3x_SetLightPosition (10.,10.,10.);
-	g3x_SetLightDirection( 0., 0., 0.);  
+	g3x_SetLightDirection( 0.1, 0.5, 0.7);  
 
 
   /* définition des fonctions */
