@@ -1,6 +1,5 @@
 
 
-
 Shape * InitializeRessort(Shape * str){
 
 	int i,j;
@@ -24,7 +23,7 @@ Shape * InitializeRessort(Shape * str){
 		}
 	}
 	return str;
-}
+};
 
 
 void DrawRessort(Shape * str){
@@ -73,4 +72,4 @@ void DrawRessort(Shape * str){
 	}
 	glEnd();
 
-}
+};
