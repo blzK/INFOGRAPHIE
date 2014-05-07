@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <g3x.h>
+  #include <g3x_transfo.h>
 #include "const.h"
 #include "shape.h"
 #include "ressort.c"
@@ -14,103 +15,154 @@
   
 
 
-  typedef struct Node{
-  	struct Node * nodes;
-  	struct Shape * shapes;
-  	int type;
-  	int size;
-  } Node;
 
 
-  void initScene(struct Node * str){
+  typedef struct{
+  /*	double c[16];*/
+  	double * c;
+  } HMat;
+  HMat currMat;
+  double *ptr_currMat;
+/*
+Chaque Node a une matrice de transformation
+Quand on dessine l'arbre de la scène on devra appliquer pour chaque noeud
+la transformation 
+*/
 
-  }
+typedef struct Node{
+	struct Node * nodes;
+	struct Shape * shapes;
+	int type;
+	int shapesNo; /*Nombre de fils*/
+	int sonsNo;
+  HMat Md, Mi, Mn; /*Matrices 4x4 directe, inverse, normale*/
+} Node;
+
+
+void initNodeMatrix(struct Node * str){
+	str->Md.c=malloc(16*sizeof(double));
+	str->Mi.c=malloc(16*sizeof(double));
+	str->Mn.c=malloc(16*sizeof(double));
+	memset(str->Md.c, 0,16*sizeof(double));
+	memset(str->Mi.c, 0,16*sizeof(double));
+	memset(str->Mn.c, 0,16*sizeof(double));
+	G3Xloadidentity(str->Md.c);
+	G3Xloadidentity(str->Mi.c);
+	G3Xloadidentity(str->Mn.c);
+}
 
 
 
-	void InitializeShape(Shape * str){
-		glColor4fv(orange);
-		glTranslatef(5.,5.,-1);
-		switch (str->ID){
-			case 0:
-			InitializePave(str);
-			break;
-			case 1:
-			InitializeSphere(str);
-			break;
-			case 2:
-			InitializeCylindre(str);
-			break;
-			case 3:
-			InitializeTore(str);
-			break;
-			case 4:
-			InitializeRessort(str);
-			break;
-		}
+void InitializeShape(Shape * str){
+	glColor4fv(orange);
+	glTranslatef(5.,5.,-1);
+	switch (str->ID){
+		case 0:
+		InitializePave(str);
+		break;
+		case 1:
+		InitializeSphere(str);
+		break;
+		case 2:
+		InitializeCylindre(str);
+		break;
+		case 3:
+		InitializeTore(str);
+		break;
+		case 4:
+		InitializeRessort(str);
+		break;
 	}
+}
 
-	void DrawShape(Shape * str){
-		glColor4fv(orange);
+void DrawShape(Shape * str){
+	glColor4fv(orange);
 		/*glTranslatef(5.,5.,-1);*/
-		switch (str->ID){
-			case 0:
-			g3x_Material(vert,ambi,diff,spec,shin,1.);
-			DrawPave(str);
-			break;
-			case 1:
-			g3x_Material(rouge,ambi,diff,spec,shin,1.);
-			DrawSphere(str);
-			break;
-			case 2:
-			g3x_Material(orange,ambi,diff,spec,shin,1.);
-			DrawCylindre(str);
-			break;
-			case 3:
-			g3x_Material(jaune,ambi,diff,spec,shin,1.);
-			DrawTore(str);
-			break;
-			case 4:
-			g3x_Material(cyan,ambi,diff,spec,shin,1.);
-			DrawRessort(str);
-			break;
-		}        
+	printf("drawing shape %d\n", str->ID);
+	switch (str->ID){
+		case 0:
+		g3x_Material(vert,ambi,diff,spec,shin,1.);
+		DrawPave(str);
+		break;
+		case 1:
+		g3x_Material(rouge,ambi,diff,spec,shin,1.);
+		DrawSphere(str);
+		break;
+		case 2:
+		g3x_Material(orange,ambi,diff,spec,shin,1.);
+		DrawCylindre(str);
+		break;
+		case 3:
+		g3x_Material(jaune,ambi,diff,spec,shin,1.);
+		DrawTore(str);
+		break;
+		case 4:
+		g3x_Material(cyan,ambi,diff,spec,shin,1.);
+		DrawRessort(str);
+		break;
+	}        
+}
+
+void DrawLeaf(Node * str){ 
+	int i,size;
+	printf("Entering DrawLeaf\n");
+	size=(str->shapesNo);
+
+	printf("%d\n", size);
+/*Application de la matrice directe*/
+
+	g3x_ProdHMat(str->Md.c,ptr_currMat, ptr_currMat);
+	
+/*Dessin*/
+	printf("shapes \n");
+	for(i=0;i<size;i++){
+		DrawShape(&(str->shapes)[i]);
 	}
 
-	void DrawLeaf(Node * str){ 
-		int i,size;
-		printf("Entering DrawLeaf\n");
-		size=(str->size);
-		printf("%d\n", size);
+/*Application de la matrice inverse*/
+	g3x_ProdHMat(str->Mi.c,ptr_currMat,ptr_currMat);
+}
 
-		printf("shapes \n");
-		for(i=0;i<size;i++){
-			DrawShape(&(str->shapes)[i]);
-		}
+void DrawsubNode(Node * str){
+
+}
+
+void DrawNodes(Node * str){
+	int size,i;
+
+	size=str->sonsNo;
+
+
+	if(str->type==0){
+		printf("I'm an object %d\n",size );
+		DrawLeaf(str);
 	}
+	else if(str->type==1){/*Si c'est un macro-object*/
+	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
+	printf("Drawing macro-object %d\n",size );
+	DrawLeaf(str);
+	printf("Go to son \n");
+	Node *son;
+	for(i=0;i<(str->sonsNo);i++){
+		printf("test\n");
+		son=&((str->nodes)[i]);
+		printf("looking son  %d type %d\n", i, son->type );
+		DrawNodes(son);
 
- 
-	void DrawNodes(Node * str){
-		int size,i;
-
-		size=str->size;
-		printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-
-		if(str->type==0){
-			printf("I'm a leaf %d\n",size );
-			DrawLeaf(str);
-		}
-	else if(str->type==1){/*Si c'est un noeud*/
-		printf("Go to son \n");
-		Node *son;
-		for(i=0;i<(str->size);i++){
-			printf("test\n");
-			son=&((str->nodes)[i]);
-			printf("looking son  %d type %d\n", i, son->type );
-			DrawNodes(son);
-
-		}
 	}
+}
+	else if(str->type==2){/*Si c'est un noeud*/
+printf("I'm a Node my size is %d my type is %d\n",size, str->type );
+printf("Go to son \n");
+Node *son;
+for(i=0;i<(str->sonsNo);i++){
+	printf("test\n");
+	son=&((str->nodes)[i]);
+	printf("looking son  %d type %d\n", i, son->type );
+	DrawNodes(son);
+
+}
+}
 }
 
 Shape * test(Shape * s){
@@ -164,8 +216,16 @@ struct Node scene;
 struct Node *ptr_sc= &scene;
 struct Node n1;
 struct Node *ptr_n1= &n1;
+struct Node n2;
+struct Node *ptr_n2= &n2;
 
 void Init(void){
+
+	ptr_currMat =currMat.c;
+	ptr_currMat=malloc(16*sizeof(double));
+	memset(ptr_currMat, 0,16*sizeof(double));
+	G3Xloadidentity(ptr_currMat);
+
 	/*pave*/
 	p1.ID=0;
 	/*sphere*/
@@ -186,26 +246,44 @@ void Init(void){
 
 
 /*initScene(ptr_sc);*/
-	ptr_n1->shapes=(Shape *)malloc(5*sizeof(Shape));
-	ptr_n1->size=5;
-	ptr_n1->type=0;
-	ptr_n1->shapes[0]=p1;
-	ptr_n1->shapes[1]=s1;
-	ptr_n1->shapes[2]=c1;
-	ptr_n1->shapes[3]=t1;
-	ptr_n1->shapes[4]=r1;
- 
-	ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
-	ptr_sc->size=1;
-	ptr_sc->type=1;
-	ptr_sc->nodes[0]=n1;
+	ptr_n2->shapes=(Shape *)malloc(5*sizeof(Shape));
+	ptr_n2->shapesNo=5;
+	ptr_n2->type=0;
+	ptr_n2->shapes[0]=p1;
+	ptr_n2->shapes[1]=s1;
+	ptr_n2->shapes[2]=c1;
+	ptr_n2->shapes[3]=t1;
+	ptr_n2->shapes[4]=r1;
+	initNodeMatrix(ptr_n2);
 
-  
+
+
+
+	ptr_n1->nodes=(Node *)malloc(1*sizeof(Node));
+	ptr_n1->sonsNo=1;
+	ptr_sc->shapesNo=0;
+	ptr_n1->type=1;
+	initNodeMatrix(ptr_n1);
+	g3x_MakeTranslationXYZ(ptr_n1->Md.c, 10,10,10);
+	g3x_MakeTranslationXYZ(ptr_n1->Mi.c, -10,-10,-10);
+	ptr_n1->nodes[0]=n2;
+
+
+
+
+	ptr_sc->nodes=(Node *)malloc(1*sizeof(Node));
+	ptr_sc->sonsNo=1;
+	ptr_sc->shapesNo=0;
+	ptr_sc->type=2;
+	ptr_sc->nodes[0]=n1;
+	initNodeMatrix(ptr_sc);
+
+
 
 	g3x_CreateScrollv_i("n",&n,3,N,1.0," ");
 	g3x_CreateScrollv_i("p",&p,3,P,1.0," ");
 	g3x_CreateScrollh_d("r",&r,0.1,10.,1.," ");
- 
+
 
 /*type de scroll 
 h horizontal  
@@ -216,8 +294,11 @@ d double
 */  
 
 }
+
+
 void Anim(void)
 {
+
 }
 
 /* flag d'affichag/masquage */
@@ -232,21 +313,21 @@ static void Dessin(void)
 	glEnable(GL_LIGHTING);
 	
 	glPushMatrix(); 
-	/*glScalef(0.7,.7,0.7);*/
-	/*DrawNodes(ptr_sc);*/
+	glScalef(0.7,.7,0.7);
+	DrawNodes(ptr_sc);
 	/*glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.); */ 
 	g3x_Material(rouge,ambi,diff,spec,shin,1.);
- 
- 
+
+
 	glPointSize(r);  
 	glColor4fv(rouge); 
 	
- 
+
 	glColor4fv(orange); 
 	g3x_Material(orange,ambi, diff,spec,shin,1.);
-  
-   
+
+
 /* On dessine la sphere*/
 	/*glPopMatrix(); 
 	glPushMatrix();      
@@ -260,12 +341,12 @@ static void Dessin(void)
 	DrawShape(ptr_s1);
 */
 /* On dessine le Pave*/
-	glPopMatrix();
+	/*glPopMatrix();
 	glPushMatrix();
 	/*glTranslatef(-3.,0.,-1); */
-	glScalef(2.5,2.5,2.5); 
-		DrawShape(ptr_p1);
-
+	/*glScalef(2.5,2.5,2.5); 
+	DrawShape(ptr_p1);
+*/
 
 /* On dessine le Cylindre
 	glPopMatrix();
@@ -290,10 +371,10 @@ static void Dessin(void)
 	glTranslatef(-5.,-5.,-5);
 */ 
 
- 
-   
+
+
 } 
- 
+
 /*=    ACTION A EXECUTER EN SORTIE   =*/
 /*= libération de mémoire, nettoyage =*/ 
 /*= -> utilise la pile de <atexit()> =*/
@@ -350,7 +431,7 @@ int main(int argc, char** argv)
 	g3x_SetLightPosition (0.,0.,10.);
 	g3x_SetLightDirection( 0, 0, -1);  
 
- 
+
   /* définition des fonctions */
   g3x_SetExitFunction(Exit  );     /* la fonction de sortie */
   g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
