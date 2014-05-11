@@ -328,12 +328,11 @@ On est obligé de passer par des matrices temporaires*/
 	initMatrix(&temp);
 	initMatrix(&temp2);
 	initMatrix(&temp3);
-	g3x_MakeRotationX(temp.c, 0.001);
-	/*
+	g3x_MakeRotationX(temp.c, 0.1);
 	g3x_MakeTranslationXYZ(temp2.c,0,-4,0);
 	g3x_MakeHomothetieXYZ(temp3.c, 1,1,0.5);
 	g3x_ProdHMat(temp.c,temp2.c,temp.c);
-	g3x_ProdHMat(temp.c,temp3.c,ptr_n1->Md.c);*/
+	g3x_ProdHMat(temp.c,temp3.c,ptr_n1->Md.c);
 g3x_ProdHMat(temp.c,ptr_n1->Md.c,ptr_n1->Md.c);
 
 	/*g3x_MakeRotationX(ptr_n1->Md.c, 1.5);*/
@@ -341,12 +340,12 @@ g3x_ProdHMat(temp.c,ptr_n1->Md.c,ptr_n1->Md.c);
 	initMatrix(&temp);
 	initMatrix(&temp2);
 	initMatrix(&temp3);
-/*	g3x_MakeRotationX(temp.c, -1.5);
+	g3x_MakeRotationX(temp.c, -1.5);
 	g3x_MakeTranslationXYZ(temp2.c,0,4,0);
 	g3x_MakeHomothetieXYZ(temp3.c, 1,1,2);
 	g3x_ProdHMat(temp.c,temp2.c,temp.c);
 	g3x_ProdHMat(temp.c,temp3.c,ptr_n1->Mi.c);
-*/
+
 
 /*
 	g3x_MakeRotationX(ptr_n1->Mi.c, -1.5);
