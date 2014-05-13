@@ -1,10 +1,12 @@
 
 Shape * InitializeTore(Shape *str){
+	str->initialized=false;
 
 	int i,j;
 	double a=2*PI/N;
   	double b=2*PI/P;/*double b=PI/P;*/
-	/*double r=1;*/
+	double rayon=0.5;
+	str->pointNo=N*P;
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));
 	str->norm=malloc(N*P*sizeof(G3Xvector));
 	memset(str->vrtx, 0,N*P*sizeof(G3Xpoint));
@@ -19,9 +21,9 @@ Shape * InitializeTore(Shape *str){
 
 		for (j=0;j<=P;j++)
 		{
-			(*vt)[0]=(3*r+r*cos(j*a))*(cos(i*b));
-			(*vt)[1]=(3*r+r*cos(j*a))*sin(i*b);
-			(*vt)[2]=r*sin(j*a);
+			(*vt)[0]=(rayon+0.25*rayon*cos(j*a))*(cos(i*b));
+			(*vt)[1]=(rayon+0.25*rayon*cos(j*a))*sin(i*b);
+			(*vt)[2]=rayon*sin(j*a);
 
 			ptemp[i%4]=vt;
 
@@ -38,9 +40,12 @@ Shape * InitializeTore(Shape *str){
 	return str;
 }
 
+void DrawTore(Shape * str, double *ptr_Mat){
 
-void DrawTore(Shape * str){
-
+	if (str->initialized!=true)
+	{
+		str->initialized=UpdateShape(str, ptr_Mat);
+	}
 	int i,j,k;
 	i=0;
 	j=0;

@@ -1,25 +1,28 @@
 
+
 Shape * InitializeCylindre(Shape * str){
+	str->initialized=false;
 
 	int i,j;
 	double a=2*PI/N;
 	double b=PI/P;
+	double rayon=0.5;
+	str->pointNo=N*P;
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));
 	str->norm=malloc(N*P*sizeof(G3Xvector));
 	memset(str->vrtx, 0,N*P*sizeof(G3Xpoint));
 	memset(str->norm, 0,N*P*sizeof(G3Xvector));
-	G3Xpoint *vt=str->vrtx;
+	G3Xpoint *vt=str->vrtx;  
 	G3Xvector *vn=str->norm;
-	
 	for(i=0;i<=N;i++)
 	{
 
 		for (j=0;j<=P;j++)
 		{
 
-			(*vt)[0]=r*cos(i*a);
-			(*vt)[1]=r*sin(i*a);
-			(*vt)[2]=j*b;	
+			(*vt)[0]=rayon*cos(i*a);
+			(*vt)[1]=rayon*sin(i*a);
+			(*vt)[2]=2*j*rayon/P-0.5;	
 
 			(*vn)[0]=cos(i*a);
 			(*vn)[1]=sin(i*a);
@@ -33,10 +36,13 @@ Shape * InitializeCylindre(Shape * str){
 	return str;
 }
 
+void DrawCylindre(Shape * str, double *ptr_Mat){
 
 
-
-void DrawCylindre(Shape * str){
+	if (str->initialized!=true)
+	{
+		str->initialized=UpdateShape(str, ptr_Mat);
+	}
 
 	int i,j,k,N2,P2;
 	i=0;

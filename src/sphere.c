@@ -4,6 +4,8 @@ Shape * InitializeSphere(Shape * str){
 	int i,j;
 	double a=2*PI/N;
 	double b=PI/P;
+	str->pointNo=N*P;
+	str->initialized=false;
 
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));
 	str->norm=malloc(N*P*sizeof(G3Xvector));
@@ -39,8 +41,12 @@ Shape * InitializeSphere(Shape * str){
 }
 
 
+void DrawSphere(Shape * str, double *ptr_Mat){
 
-void DrawSphere(Shape * str){
+	if (str->initialized!=true)
+	{
+		str->initialized=UpdateShape(str, ptr_Mat);
+	}	str->pointNo=N*P;
 
 	int i,j,k,N2,P2;
 	i=0;
@@ -75,7 +81,7 @@ glEnd();*/
 
 
 
-				k = i*P+j;
+			k = i*P+j;
 			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);
 
@@ -92,48 +98,48 @@ glEnd();*/
 			glVertex3dv(str->vrtx[k]);
 
 		}
-					k = i*P+j;
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = i*P+j;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = i*P + (j+stepp);
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = i*P + (j+stepp);
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = (i+stepn)*P+(j+stepp);
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = (i+stepn)*P+(j+stepp);
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = (i+stepn)*P + j; 
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = (i+stepn)*P + j; 
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
 
 
 	}
 
 
 
-		for(j=0;j<P;j+=stepp){
+	for(j=0;j<P;j+=stepp){
 
 
-i=N-stepn;
-				k = i+j;
+		i=N-stepn;
+		k = i+j;
 			/*glNormal3dv(str->norm[k]);*/
-			glVertex3dv(str->vrtx[k]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = i + (j+stepp);
+		k = i + (j+stepp);
 			/*glNormal3dv(str->norm[k]);*/
-			glVertex3dv(str->vrtx[k]);
-i=stepn;
-			k = (i+stepn)+(j+stepp);
+		glVertex3dv(str->vrtx[k]);
+		i=stepn;
+		k = (i+stepn)+(j+stepp);
 			/*glNormal3dv(str->norm[k]);*/
-			glVertex3dv(str->vrtx[k]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = (i+stepn) + j; 
+		k = (i+stepn) + j; 
 			/*glNormal3dv(str->norm[k]);*/
-			glVertex3dv(str->vrtx[k]);
+		glVertex3dv(str->vrtx[k]);
 
-		}
+	}
 
 
 	

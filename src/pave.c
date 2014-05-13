@@ -1,10 +1,12 @@
 
+
 Shape * InitializePave(Shape * str){
 
 	int i,j;
 	double a=2*PI/N;
 	double b=2*PI/P;
-
+	str->pointNo=8;
+	str->initialized=false;
 	str->vrtx=malloc(8*sizeof(G3Xpoint));
 	str->norm=malloc(6*sizeof(G3Xvector));
 	memset(str->vrtx, 0,8*sizeof(G3Xpoint));
@@ -18,24 +20,24 @@ Shape * InitializePave(Shape * str){
 
 	(*v2)[0]=(-1)*T/(2.0f);
 	(*v2)[1]=(-1)*T/(2.0f);
-	(*v2)[2]=0;
+	(*v2)[2]=T/2.0f;
 	v2++;
 
 	(*v2)[0]=T/2.0f;
 	(*v2)[1]=-T/2.0f;
-	(*v2)[2]=0;
+	(*v2)[2]=T/2.0f;
 	v2++;
 
 	(*v2)[0]=T/2.0f;
 	(*v2)[1]=T/2.0f;
-	(*v2)[2]=0;
+	(*v2)[2]=T/2.0f;
 	v2++;
 
 
 
 	(*v2)[0]=-T/2.0f;
 	(*v2)[1]=T/2.0f;
-	(*v2)[2]=0;
+	(*v2)[2]=T/2.0f;
 	v2++;
 	
 
@@ -59,7 +61,7 @@ Shape * InitializePave(Shape * str){
 	(*v2)[1]=T/2.0f;
 	(*v2)[2]=-T/2.0f;
 
-
+/*NORMALES */
 	(*vn)[0]=-T;
 	(*vn)[1]=0;
 	(*vn)[2]=0;
@@ -96,13 +98,41 @@ Shape * InitializePave(Shape * str){
 	return str;
 }
 
-void DrawPave(Shape * str){
+/*void InitializePaveTransformation(Shape * str,  double *ptr_Mat){
+	G3Xpoint *v2=str->vrtx;
+	G3Xpoint *vn=str->norm;
+	int q;
+	q=0;
 
+G3Xpoint ResultPoint;
+
+for (q = 0; q < 8; ++q){
+	
+	g3x_ProdHMatPoint(ptr_Mat, *v2, ResultPoint);
+	(*v2)[0]=ResultPoint[0];
+	(*v2)[1]=ResultPoint[1];
+	(*v2)[2]=ResultPoint[2];
+	v2++;
+}
+initialized=true;
+}*/
+
+void DrawPave(Shape * str,  double *ptr_Mat){
+
+	if (str->initialized!=true)
+	{
+		/*InitializePaveTransformation(str, ptr_Mat);*/
+		str->initialized=UpdateShape(str, ptr_Mat);
+	}
 	int i,j,k,N2,P2,l;
 	i=0;
 	j=0;
 	k=0;
-
+	/*
+	if(animate==true){
+	InitializePaveTransformation(str,R);	
+	}
+	*/
 
 	int stepn=N/n; int stepp=P/p;
 
@@ -161,6 +191,7 @@ void DrawPave(Shape * str){
 	glVertex3dv(str->vrtx[2]);
 	glVertex3dv(str->vrtx[3]);
 	glNormal3dv(str->norm[4]);
+	
 /*face d'en bas*/
 
 	glVertex3dv(str->vrtx[4]);

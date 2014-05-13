@@ -4,14 +4,13 @@
 
 #include <stdio.h>
 #include <g3x.h>
-  #include <g3x_transfo.h>
 #include "const.h"
 #include "shape.h"
 #include "ressort.c"
 #include "sphere.c"
-  #include "tore.c"
-  #include "pave.c"
-  #include "cylindre.c"
+#include "tore.c"
+#include "pave.c"
+#include "cylindre.c"
   
 
 
@@ -46,9 +45,20 @@ void initNodeMatrix(struct Node * str){
 	memset(str->Md.c, 0,16*sizeof(double));
 	memset(str->Mi.c, 0,16*sizeof(double));
 	memset(str->Mn.c, 0,16*sizeof(double));
-	G3Xloadidentity(str->Md.c);
-	G3Xloadidentity(str->Mi.c);
-	G3Xloadidentity(str->Mn.c);
+	g3x_MakeIdentity(str->Md.c);
+	g3x_MakeIdentity(str->Mi.c);
+	g3x_MakeIdentity(str->Mn.c);
+	/*G3Xloadidentity(str->Md.c);*/
+	/*str->Md.c=G3Xidentity;*/
+	int i;
+
+	for (i = 0; i < 16; ++i)
+	{
+		printf("Matrice directe i = %d -> %f\n", i, str->Md.c[i]);
+	}
+
+	/*g3x_MPrintHMat(str->Md.c);*/
+
 }
 
 
@@ -110,9 +120,17 @@ void DrawLeaf(Node * str){
 
 	printf("%d\n", size);
 /*Application de la matrice directe*/
+	/*glPushMatrix();*/
+	glGetDoublev( GL_MODELVIEW, ptr_currMat);
 
-	g3x_ProdHMat(str->Md.c,ptr_currMat, ptr_currMat);
-	
+	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
+
+	glMatrixMode(GL_MODELVIEW);
+
+	glLoadMatrixd(ptr_currMat);
+
+
+
 /*Dessin*/
 	printf("shapes \n");
 	for(i=0;i<size;i++){
@@ -120,7 +138,10 @@ void DrawLeaf(Node * str){
 	}
 
 /*Application de la matrice inverse*/
-	g3x_ProdHMat(str->Mi.c,ptr_currMat,ptr_currMat);
+	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
+	/*glPopMatrix();*/
+	glLoadMatrixd(ptr_currMat);
+
 }
 
 void DrawsubNode(Node * str){
@@ -140,7 +161,18 @@ void DrawNodes(Node * str){
 	else if(str->type==1){/*Si c'est un macro-object*/
 	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
 	printf("Drawing macro-object %d\n",size );
-	DrawLeaf(str);
+	/*Application de la matrice directe*/
+
+	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixd(ptr_currMat);
+/*Dessin*/
+	printf("shapes \n");
+	for(i=0;i<str->shapesNo;i++){
+		DrawShape(&(str->shapes)[i]);
+	}
+/*Dessine ses fils*/
 	printf("Go to son \n");
 	Node *son;
 	for(i=0;i<(str->sonsNo);i++){
@@ -150,6 +182,13 @@ void DrawNodes(Node * str){
 		DrawNodes(son);
 
 	}
+
+	/*Application de la matrice inverse*/
+	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
+	/*glPopMatrix();*/
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixd(ptr_currMat);
 }
 	else if(str->type==2){/*Si c'est un noeud*/
 printf("I'm a Node my size is %d my type is %d\n",size, str->type );
@@ -224,7 +263,9 @@ void Init(void){
 	ptr_currMat =currMat.c;
 	ptr_currMat=malloc(16*sizeof(double));
 	memset(ptr_currMat, 0,16*sizeof(double));
-	G3Xloadidentity(ptr_currMat);
+	g3x_MakeIdentity(ptr_currMat);
+	glMatrixMode(GL_MODELVIEW);
+	glGetDoublev( GL_MODELVIEW, ptr_currMat);
 
 	/*pave*/
 	p1.ID=0;
@@ -264,8 +305,10 @@ void Init(void){
 	ptr_sc->shapesNo=0;
 	ptr_n1->type=1;
 	initNodeMatrix(ptr_n1);
-	g3x_MakeTranslationXYZ(ptr_n1->Md.c, 10,10,10);
-	g3x_MakeTranslationXYZ(ptr_n1->Mi.c, -10,-10,-10);
+	
+	/*g3x_MakeTranslationXYZ(ptr_n1->Md.c,0,0,3);
+	g3x_MakeTranslationXYZ(ptr_n1->Mi.c, 0,0,-3);*/
+
 	ptr_n1->nodes[0]=n2;
 
 
@@ -299,13 +342,12 @@ d double
 void Anim(void)
 {
 
+	/*glMatrixMode(GL_MODELVIEW);
+	glGetDoublev( GL_MODELVIEW, ptr_currMat);
+	glLoadMatrixd(ptr_currMat);*/
 }
 
-/* flag d'affichag/masquage */
-static bool FLAG_TEAPOT=true;
-static bool FLAG_TORUS =true;
-static bool FLAG_CONE  =true;
-static bool FLAG_ICOS  =true;
+
 
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
@@ -313,7 +355,7 @@ static void Dessin(void)
 	glEnable(GL_LIGHTING);
 	
 	glPushMatrix(); 
-	glScalef(0.7,.7,0.7);
+	/*glScalef(0.5,0.5,0.5);*/
 	DrawNodes(ptr_sc);
 	/*glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.); */ 
@@ -435,7 +477,7 @@ int main(int argc, char** argv)
   /* définition des fonctions */
   g3x_SetExitFunction(Exit  );     /* la fonction de sortie */
   g3x_SetDrawFunction(Dessin);     /* la fonction de Dessin */
-	g3x_SetAnimFunction(NULL);
+	g3x_SetAnimFunction(Anim);
 
 
 	/* JUSTE POUT ILLUSTRATION DU TRACEUR D'ALLOC EN COMPIL DEGUG */
