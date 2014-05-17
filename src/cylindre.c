@@ -54,10 +54,10 @@ void DrawCylindre(Shape * str, double *ptr_Mat){
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE TORE*/
-	glDisable(GL_LIGHTING);
+
 
 	glBegin(GL_POINTS);
-
+	glDisable(GL_LIGHTING);
 	for(i=0;i<N-stepn;i+=stepn){
 
 		for(j=0;j<P-stepp;j+=stepp){
@@ -74,10 +74,10 @@ void DrawCylindre(Shape * str, double *ptr_Mat){
 	glEnd();
 
 	/*TEXTURE CYLINDRE*/
-	glEnable(GL_LIGHTING);
-	glBegin(GL_QUADS);
-
 	
+	glBegin(GL_QUADS);
+	glEnable(GL_LIGHTING);
+	g3x_Material(orange,ambi,diff,spec,shin,1.);
 	
 
 	for(i=0;i<N-stepn;i+=stepn){
@@ -102,65 +102,57 @@ void DrawCylindre(Shape * str, double *ptr_Mat){
 			glVertex3dv(str->vrtx[k]);
 
 		}
-		k = i*P+j;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-
-		k = i*P;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-
-		k = (i+stepn)*P;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-
-		k = (i+stepn)*P + j; 
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-
-
 
 	}
+	
+
+	
+/*raccordement */
+
+	i=N-stepn;
 	j=P-stepp;
-	for (i = 0; i< N-stepn; i++)
-	{
+	k = i*P+j;
+	glNormal3dv(str->norm[k]);
+	glVertex3dv(str->vrtx[k]);
 
+	j=0;
+	i=N-stepn;
+	k = i*P+j;
+	glNormal3dv(str->norm[k]);
+	glVertex3dv(str->vrtx[k]);
 
-		k = i*P+j;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
+	j=0;
+	i=0;
+	k = i*P+j;
+	glNormal3dv(str->norm[k]);
+	glVertex3dv(str->vrtx[k]);
 
-		k = i*P;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
+	j=P-stepp;
+	i=0;
+	k = i*P+j;
+	glNormal3dv(str->norm[k]);
+	glVertex3dv(str->vrtx[k]);
 
-		
-		k = (i+stepn)*P;
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-
-		k = (i+stepn)*P + j; 
-		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
-	}
-
-
-	/*glColor4fv(rouge);*/
-		g3x_Material(vert,ambi,diff,spec,shin,1.);
 	
 	glDisable(GL_LIGHTING);
 
 	glEnd();
 
 
-/*glColor4fv(rouge);*/
-/* Socle : cercle pour le bas du cylindre */
-	glBegin(GL_POLYGON);
+	/*g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
+	/* Socle : cercle pour le bas du cylindre */
 
+
+	glBegin(GL_POLYGON);
 	glEnable(GL_LIGHTING);
-	for(j = 0; j < P-stepp; j+= stepp)
+	g3x_Material(vert,ambi,diff,spec,shin,1.);
+	for(i = 0; i < N-stepn; i+= stepn)
 	{
-		k = (N - stepn)*P + j%P;
+		/*i*p+j*/
+		i=i%N;
+		j=P-stepp;
+		k=i*P+j;
+		k = i*P + j;
 		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
 	}
@@ -171,8 +163,7 @@ void DrawCylindre(Shape * str, double *ptr_Mat){
 
 
 /* Couvercle : cercle pour le haut du cylindre */
-	glBegin(GL_POLYGON);
-	glEnable(GL_LIGHTING);
+	/*glBegin(GL_POLYGON);
 	for(j = 0; j < P-stepp; j+= stepp)
 	{
 		k = (N/2 - stepn)*P + j%P;
@@ -181,10 +172,10 @@ void DrawCylindre(Shape * str, double *ptr_Mat){
 	}
 	glNormal3dv(str->norm[(N/2 - stepn)*P + j%P]);
 	glVertex3dv(str->vrtx[(N/2 - stepn)*P + j%P]);
-
-
 	glEnd();
-	glDisable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);*/
+
+
 }
 
 

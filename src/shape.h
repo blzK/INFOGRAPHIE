@@ -23,11 +23,11 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 	G3Xpoint *vn= str->norm;
 	G3Xpoint *vC;
 	G3Xpoint *vCn;
+
 	int q;
 	q=0;
- 
+
 	G3Xpoint ResultPoint;
-	
 	G3Xpoint ResultPoint2;
 /*
 Il faudrait faire la multiplication avec la forme canonique !
@@ -41,6 +41,19 @@ for (q = 0; q < str->pointNo; ++q){
 	(*v2)[2]=ResultPoint[2];
 	v2++; 
 }
+
+/*
+for (q = 0; q < str->normNo; ++q){
+	g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
+		/*Transformation des normales*/
+/*	(*vn)[0]=ResultPoint2[0];
+	(*vn)[1]=ResultPoint2[1];
+	(*vn)[2]=ResultPoint2[2];
+	vCn++;  
+	vn++;   
+
+}
+
 /*
 for (q = 0; q < str->normNo; ++q){
 	g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);

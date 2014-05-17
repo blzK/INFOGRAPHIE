@@ -7,7 +7,7 @@ Shape * InitializeTore(Shape *str){
   	double b=2*PI/P;/*double b=PI/P;*/
 	double rayon=0.5;
 	str->pointNo=N*P;
-	str->normNo=2*N*P;
+	str->normNo=N*P;
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));
 	str->norm=malloc(N*P*sizeof(G3Xvector));
 	memset(str->vrtx, 0,N*P*sizeof(G3Xpoint));
