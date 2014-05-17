@@ -6,6 +6,7 @@ Shape * InitializePave(Shape * str){
 	double a=2*PI/N;
 	double b=2*PI/P;
 	str->pointNo=8;
+	str->normNo=6;
 	str->initialized=false;
 	str->vrtx=malloc(8*sizeof(G3Xpoint));
 	str->norm=malloc(6*sizeof(G3Xvector));

@@ -77,9 +77,6 @@ void initMatrix(HMat * mat){
 
 }
 
-
-
-
 void InitializeShape(Shape * str){
 	glColor4fv(orange);
 	glTranslatef(5.,5.,-1);
@@ -125,7 +122,7 @@ void InitCanonical(){
 	tore_canonical.ID=3;
 	ressort_canonical.ID=4;
 
-	InitializeShape(&pave_canonical);
+	InitializeShape(&pave_canonical); 
 	InitializeShape(&cylindre_canonical);
 	InitializeShape(&sphere_canonical);
 	InitializeShape(&tore_canonical);
@@ -147,10 +144,8 @@ donc sauvegarder un type canonique...
 
 bool UpdateShape2(Shape * str,  double *ptr_Mat){
 
-	G3Xpoint *v2 ;
-	G3Xpoint *vn;
-	v2=str->vrtx;
-	vn= str->norm;
+	G3Xpoint *v2=str->vrtx;
+	G3Xpoint *vn= str->norm;
 	G3Xpoint *vC;
 	G3Xpoint *vCn;
 
@@ -159,7 +154,7 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 		vC=ptr_pave_canonical->vrtx;
 		vCn=ptr_pave_canonical->norm;
 		break;
-		case 1:
+		case 1: 
 		vC=ptr_sphere_canonical->vrtx;
 		vCn=ptr_sphere_canonical->norm;
 		break;
@@ -171,7 +166,7 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 		vC=ptr_tore_canonical->vrtx;
 		vCn=ptr_tore_canonical->norm;
 		break;
-		case 4:
+		case 4: 
 		vC=ptr_ressort_canonical->vrtx;
 		vCn=ptr_ressort_canonical->norm;
 		break;
@@ -181,24 +176,36 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 	q=0;
 
 	G3Xpoint ResultPoint;
+	G3Xpoint ResultPoint2;
 
 	for (q = 0; q < str->pointNo; ++q){
 		g3x_ProdHMatPoint(ptr_Mat, *vC, ResultPoint);
+		/*Transformation des vertex*/
 		(*v2)[0]=ResultPoint[0];
 		(*v2)[1]=ResultPoint[1];
 		(*v2)[2]=ResultPoint[2];
-
-		vC++;
 		v2++; 
+		vC++;
+	}
+		q=0;
+	for (q = 0; q < str->normNo; ++q){
+		g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
+		/*Transformation des normales*/
+		(*vn)[0]=ResultPoint2[0];
+		(*vn)[1]=ResultPoint2[1];
+		(*vn)[2]=ResultPoint2[2];
+		vCn++; 
+		vn++;   
+ 
 	}
 /*printf("%f  %f  %f\n", *vC[0],vC[1],vC[2]);*/
 
-	return true;
+		return true; 
 
-}
-
-void DrawShape(Shape * str){
-	glColor4fv(orange);
+	}  
+ 
+	void DrawShape(Shape * str){
+	glColor4fv(orange); 
 	/*G3Xpoint R1;*/
 
 	/*g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);*/
@@ -207,178 +214,126 @@ void DrawShape(Shape * str){
 
 	/*UpdateShape2(str,ptr_currMat);*/
 
-	printf("drawing shape %d\n", str->ID);
-	switch (str->ID){
-		case 0: 
-		g3x_Material(vert,ambi,diff,spec,shin,1.);
-		DrawPave(str,ptr_currMat);
-		break;
-		case 1:  
-		g3x_Material(rouge,ambi,diff,spec,shin,1.);
-		DrawSphere(str,ptr_currMat);
-		break;
-		case 2:
-		g3x_Material(orange,ambi,diff,spec,shin,1.);
-		DrawCylindre(str,ptr_currMat);
-		break;
-		case 3:
-		g3x_Material(jaune,ambi,diff,spec,shin,1.);
-		DrawTore(str,ptr_currMat);
-		break;
-		case 4:
-		g3x_Material(cyan,ambi,diff,spec,shin,1.);
-		DrawRessort(str,ptr_currMat);   
-		break;
-	}        
-}
+		printf("drawing shape %d\n", str->ID);
+		switch (str->ID){
+			case 0: 
+			g3x_Material(vert,ambi,diff,spec,shin,1.);
+			DrawPave(str,ptr_currMat);
+			break;
+			case 1:  
+			g3x_Material(rouge,ambi,diff,spec,shin,1.);
+			DrawSphere(str,ptr_currMat);
+			break;
+			case 2:
+			g3x_Material(orange,ambi,diff,spec,shin,1.);
+			DrawCylindre(str,ptr_currMat);
+			break;
+			case 3:
+			g3x_Material(jaune,ambi,diff,spec,shin,1.);
+			DrawTore(str,ptr_currMat);
+			break;
+			case 4:
+			g3x_Material(cyan,ambi,diff,spec,shin,1.);
+			DrawRessort(str,ptr_currMat);   
+			break;
+		}        
+	}
 
 
 
 
-void DrawLeaf(Node * str){ 
-	int i,size;
-	printf("Entering DrawLeaf\n");
-	size=(str->shapesNo);
+	void DrawLeaf(Node * str){ 
+		int i,size;
+		printf("Entering DrawLeaf\n");
+		size=(str->shapesNo);
 
-	printf("%d\n", size);
+		printf("%d\n", size);
 /*Application de la matrice directe*/
 	/*glPushMatrix();*/
 
 
-	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
+		g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
 
 
 /*Dessin*/
-	printf("shapes \n");
-	for(i=0;i<size;i++){
+		printf("shapes \n");
+		for(i=0;i<size;i++){
 		/*UpdateShape2(&(str->shapes)[i],ptr_currMat);*/
-		DrawShape(&(str->shapes)[i]);
-	}
+			DrawShape(&(str->shapes)[i]);
+		}
 
 /*Application de la matrice inverse*/
-	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
+		g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
 
-
-}
-
-void DrawsubNode(Node * str){
-
-}
-
-
-void DrawNodes(Node * str, double * ptr_Mat){
-	int size,i;
-
-	size=str->sonsNo;
-
-
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		DrawLeaf(str);
 
 	}
+
+	void DrawsubNode(Node * str){
+
+	}
+
+
+	void DrawNodes(Node * str, double * ptr_Mat){
+		int size,i;
+
+		size=str->sonsNo;
+
+
+		if(str->type==0){
+			printf("I'm an object %d\n",size );
+			DrawLeaf(str);
+
+		}
 else if(str->type==1){/*Si c'est un macro-object*/
-	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
-	printf("Drawing macro-object %d\n",size );
+		printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
+		printf("Drawing macro-object %d\n",size );
+/*Application de la matrice directe*/
+	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
+		g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);
+
+/*Dessin*/
+		printf("shapes \n");
+		for(i=0;i<str->shapesNo;i++){
+			DrawShape(&(str->shapes)[i]);
+		}
+/*Dessine ses fils*/
+		printf("Go to son \n");
+		Node *son;
+		for(i=0;i<(str->sonsNo);i++){
+			printf("test\n");
+			son=&((str->nodes)[i]);
+			printf("looking son %d type %d\n", i, son->type );
+			DrawNodes(son,ptr_Mat);
+
+		}
+
+/*Application de la matrice inverse*/
+/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
+		g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);
+
+	}
+else if(str->type==2){/*Si c'est un noeud*/
+	printf("I'm a Node my size is %d my type is %d\n",size, str->type );
+	printf("Go to son \n");
+	Node *son;
+
 /*Application de la matrice directe*/
 	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
 	g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);
 
-/*Dessin*/
-	printf("shapes \n");
-	for(i=0;i<str->shapesNo;i++){
-		DrawShape(&(str->shapes)[i]);
-	}
-/*Dessine ses fils*/
-	printf("Go to son \n");
-	Node *son;
+
 	for(i=0;i<(str->sonsNo);i++){
 		printf("test\n");
 		son=&((str->nodes)[i]);
 		printf("looking son %d type %d\n", i, son->type );
-		DrawNodes(son,ptr_Mat);
-
+		DrawNodes(son, ptr_Mat);
 	}
 
 /*Application de la matrice inverse*/
 /*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
 	g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);
-
-}
-else if(str->type==2){/*Si c'est un noeud*/
-printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-printf("Go to son \n");
-Node *son;
-
-/*Application de la matrice directe*/
-	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
-g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);
-
-
-for(i=0;i<(str->sonsNo);i++){
-	printf("test\n");
-	son=&((str->nodes)[i]);
-	printf("looking son %d type %d\n", i, son->type );
-	DrawNodes(son, ptr_Mat);
-}
-
-/*Application de la matrice inverse*/
-/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
-g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);
 }
 }
-
-
-/*void DrawNodes_ok(Node * str){
-	int size,i;
-
-	size=str->sonsNo;
-
-
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		DrawLeaf(str);
-	}
-else if(str->type==1){/*Si c'est un macro-object*/
-/*	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
-	printf("Drawing macro-object %d\n",size );
-/*Application de la matrice directe*/
-
-/*	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
-
-/*Dessin*/
-/*	printf("shapes \n");
-	for(i=0;i<str->shapesNo;i++){
-		DrawShape(&(str->shapes)[i]);
-	}
-/*Dessine ses fils*/
-/*	printf("Go to son \n");
-	Node *son;
-	for(i=0;i<(str->sonsNo);i++){
-		printf("test\n");
-		son=&((str->nodes)[i]);
-		printf("looking son %d type %d\n", i, son->type );
-		DrawNodes(son);
-
-	}
-
-/*Application de la matrice inverse*/
-/*	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
-}
-else if(str->type==2){/*Si c'est un noeud*/
-/*printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-printf("Go to son \n");
-Node *son;
-for(i=0;i<(str->sonsNo);i++){
-	printf("test\n");
-	son=&((str->nodes)[i]);
-	printf("looking son %d type %d\n", i, son->type );
-	DrawNodes(son);
-
-}
-}
-}*/
-
 
 
 
@@ -880,7 +835,7 @@ On est obligé de passer par des matrices temporaires*/
 
 
 	/*g3x_MakeHomothetieXYZ(ptr_n2->Md.c, 1,1,0.5);
-	g3x_MakeHomothetieXYZ(ptr_n2->Mi.c, 1,1,2);
+	g3x_MakeHomothetieXYZ(ptr_n2->Mi.c, 1,1,2); 
 */
 
 
@@ -911,16 +866,16 @@ void Anim(void)
 	g3x_MakeRotationZ(temp.c, 0.01);
 	g3x_MakeRotationZ(temp2.c, -0.01);
 	/*Tout rotation*/
-	/*g3x_ProdHMat(temp.c, ptr_sc->Md.c, ptr_sc->Md.c);
-	g3x_ProdHMat(temp2.c, ptr_sc->Mi.c, ptr_sc->Mi.c);*/
+	g3x_ProdHMat(temp.c, ptr_sc->Md.c, ptr_sc->Md.c);
+	g3x_ProdHMat(temp2.c, ptr_sc->Mi.c, ptr_sc->Mi.c);
 	/* Tourelle rotation*/
-	g3x_ProdHMat(temp.c, ptr_n1->Md.c, ptr_n1->Md.c);
+	/*g3x_ProdHMat(temp.c, ptr_n1->Md.c, ptr_n1->Md.c);
 	g3x_ProdHMat(temp2.c, ptr_n1->Mi.c, ptr_n1->Mi.c);
-
+*/
 
 	
 	HMat anim;
-	initMatrix(&anim);
+	initMatrix(&anim); 
 	/*g3x_MakeIdentity(anim.c);*/
 	UpdateNode(ptr_sc,anim.c);
 /*DrawNodes(ptr_sc,ptr_currMat);*/
@@ -932,38 +887,6 @@ void Anim(void)
 		printf("Matrice directe i = %d -> %f\n", i, ptr_n3->Md.c[i]);
 	}
 
-	/*UpdateShape2(&(ptr_n2->shapes[0]),temp.c);*/
-	
-	
-
-
-
-	
-	/*initMatrix(&temp);*/
-	/*temp=ptr_n1->Md;*/
-
-/*	g3x_MakeRotationX(temp.c, 0.001);
-	UpdateShape2(&(ptr_n2->shapes[0]),temp.c);
-	/*DrawShape(&(ptr_n2->shapes[0]));*/
-/*DrawNodes(ptr_sc);*/
-	/*g3x_ProdHMat(ptr_currMat, temp.c, ptr_currMat);/*
-	g3x_MakeRotationX(temp.c, -1.5);
-
-		
-
-
-/* bof bof bof*/
-	/*g3x_MakeRotationX(temp.c, 0.001);
-	g3x_ProdHMat( ptr_n1->Md.c,temp.c, ptr_n1->Md.c);
-	g3x_MakeRotationX(temp.c, -0.001);
-	g3x_ProdHMat( temp.c,ptr_n1->Mi.c, ptr_n1->Mi.c);
-
-	DrawNodes(ptr_sc);*/
-
-	/*glMatrixMode(GL_MODELVIEW);
-	glGetDoublev( GL_MODELVIEW, ptr_currMat);
-	glLoadMatrixd(ptr_currMat);*/
-
 }
 
 
@@ -971,13 +894,13 @@ void Anim(void)
 /*= FONCTION DE DESSIN PRINCIPALE =*/
 static void Dessin(void)
 {	
-	glEnable(GL_LIGHTING);
-	
+	/*glEnable(GL_LIGHTING);*/
+
 	/*glPushMatrix(); */
 	/*glScalef(0.5,0.5,0.5);*/
 	HMat anim;
 	initMatrix(&anim);
-	/*g3x_MakeIdentity(anim.c);*/
+	/*g3x_MakeIdentity(anim.c);*/ 
 
 	DrawNodes(ptr_sc, anim.c);
 	/*glTranslatef(0.,0.,-10);
@@ -989,12 +912,12 @@ static void Dessin(void)
 	glColor4fv(rouge); 
 	
 
-	glColor4fv(orange); 
-	g3x_Material(orange,ambi, diff,spec,shin,1.);
+	glColor4fv(orange);  
+	g3x_Material(orange,ambi, diff,spec,shin,1.);  
 
 
 /* On dessine la sphere*/
-	/*glPopMatrix(); 
+	/*glPopMatrix();     
 	glPushMatrix();      
 		glScalef(2.5,2.5,2.5);  
 		glScalef(0.5,0.5,0.5);  
@@ -1011,10 +934,10 @@ static void Dessin(void)
 	/*glTranslatef(-3.,0.,-1); */
 	/*glScalef(2.5,2.5,2.5); 
 	DrawShape(ptr_p1);
-*/
+*/ 
 
-/* On dessine le Cylindre
-	glPopMatrix();
+/* On dessine le Cylindre 
+	glPopMatrix();  
 	glPushMatrix();
 	glTranslatef(5.,0.,-1);
 	glScalef(2.5,2.5,2.5); 
@@ -1030,7 +953,7 @@ static void Dessin(void)
 /* On dessine le Ressort*/
 /*	glTranslatef(0.,-5.,-1);
 	/*printf("%d\n",n1.size );*/
-/*	DrawShape(ptr_r1);
+/*	DrawShape(ptr_r1); 
 
  
 	glTranslatef(-5.,-5.,-5);
@@ -1054,7 +977,7 @@ static void action1(void)
 { 
 	rouge[0]-=0.01;  rouge[ 1]+=0.01;
 	vert[1] -=0.01;  vert[2] +=0.01;  
-	bleu[2] -=0.01;  bleu[0] +=0.01;
+	bleu[2] -=0.01;  bleu[0] +=0.01;   
 } 
 /*= action : variation de couleur =*/
 static void action2(void)

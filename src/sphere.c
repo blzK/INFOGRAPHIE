@@ -5,6 +5,7 @@ Shape * InitializeSphere(Shape * str){
 	double a=2*PI/N;
 	double b=PI/P;
 	str->pointNo=N*P;
+	str->normNo=N*P;
 	str->initialized=false;
 
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));

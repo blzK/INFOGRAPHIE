@@ -313,7 +313,7 @@ void UpdateLeaf(Node * str, double * ptr_Mat){
 void UpdateNode(Node * str, double * ptr_Mat){
 	int size,i;
 	size=str->sonsNo;
-
+	
 	if(str->type==0){
 		printf("I'm an object %d\n",size );
 		UpdateLeaf(str,ptr_Mat);
@@ -802,11 +802,14 @@ void Anim(void)
 	HMat temp2;
 	initMatrix(&temp);
 	initMatrix(&temp2);
-	g3x_MakeRotationX(temp.c, 0.000001);
-	g3x_MakeRotationX(temp2.c, -0.00001);
-	g3x_ProdHMat(temp.c, ptr_sc->Md.c, ptr_sc->Md.c);
-	g3x_ProdHMat(temp2.c, ptr_sc->Mi.c, ptr_sc->Mi.c);
-	UpdateNode(ptr_sc,ptr_currMat);
+	g3x_MakeRotationX(temp.c, 0.001);
+	g3x_MakeRotationX(temp2.c, -0.001);
+	g3x_ProdHMat(temp.c, ptr_n3->Md.c, ptr_sc->Md.c);
+	g3x_ProdHMat(temp2.c, ptr_n3->Mi.c, ptr_sc->Mi.c);
+	HMat anim;
+	initMatrix(&anim);
+	g3x_MakeIdentity(anim.c);
+	UpdateNode(ptr_sc,anim.c);
 
 	/*UpdateShape(&(ptr_n2->shapes[0]),temp.c);*/
 	

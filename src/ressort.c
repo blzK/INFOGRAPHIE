@@ -8,6 +8,7 @@ Shape * InitializeRessort(Shape * str){
   	double b=2*PI/P;/*double b=PI/P;*/
 	double r=1;
 	str->pointNo=2*N*P;
+	str->normNo=2*N*P;
 	str->vrtx=malloc(2*N*P*sizeof(G3Xpoint));
 	str->norm=malloc(2*N*P*sizeof(G3Xvector));
 	memset(str->vrtx, 20,2*N*P*sizeof(G3Xpoint));
