@@ -826,7 +826,7 @@ void Init(void){
 	double rot_n2[3]= {PI/2,0,0};
 	double hom_n2[3]={1,0.5,0.3};
 	double trans_n5[3]={0,0,-2};
-	double trans_n6[3]={0,0,2};
+	double trans_n6[3]={0,0,2}; 
 
 
 	/*MakeTransformation(ptr_n6,trans_n6,NULL,NULL);*/
@@ -858,7 +858,6 @@ void Init(void){
 
 
 
-/*	HMat anim;
 	initMatrix(&anim); 
 	UpdateNode(ptr_sc,anim.c);
 

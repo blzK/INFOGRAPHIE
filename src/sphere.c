@@ -6,7 +6,6 @@ Shape * InitializeSphere(Shape * str){
 	double b=PI/P;
 	str->pointNo=N*P;
 	str->normNo=N*P;
-	str->initialized=false;
 
 	str->vrtx=malloc(N*P*sizeof(G3Xpoint));
 	str->norm=malloc(N*P*sizeof(G3Xvector));
@@ -44,10 +43,8 @@ Shape * InitializeSphere(Shape * str){
 
 void DrawSphere(Shape * str, double *ptr_Mat){
 
-	if (str->initialized!=true)
-	{
-		str->initialized=UpdateShape(str, ptr_Mat);
-	}	str->pointNo=N*P;
+
+	str->pointNo=N*P;
 
 	int i,j,k,N2,P2;
 	i=0;

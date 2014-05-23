@@ -1,8 +1,6 @@
 
 
 Shape * InitializeCylindre(Shape * str){
-	str->initialized=false;
-
 	int i,j;
 	double a=2*PI/N;
 	double b=PI/P;
@@ -39,11 +37,6 @@ Shape * InitializeCylindre(Shape * str){
 
 void DrawCylindre(Shape * str, double *ptr_Mat){
 
-
-	if (str->initialized!=true)
-	{
-		str->initialized=UpdateShape(str, ptr_Mat);
-	}
 
 	int i,j,k,N2,P2;
 	i=0;

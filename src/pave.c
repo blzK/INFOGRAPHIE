@@ -7,7 +7,6 @@ Shape * InitializePave(Shape * str){
 	double b=2*PI/P;
 	str->pointNo=8;
 	str->normNo=6;
-	str->initialized=false;
 	str->vrtx=malloc(8*sizeof(G3Xpoint));
 	str->norm=malloc(6*sizeof(G3Xvector));
 	memset(str->vrtx, 0,8*sizeof(G3Xpoint));
@@ -120,11 +119,6 @@ initialized=true;
 
 void DrawPave(Shape * str,  double *ptr_Mat){
 
-	if (str->initialized!=true)
-	{
-		/*InitializePaveTransformation(str, ptr_Mat);*/
-		str->initialized=UpdateShape(str, ptr_Mat);
-	}
 	int i,j,k,N2,P2,l;
 	i=0;
 	j=0;

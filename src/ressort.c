@@ -1,7 +1,6 @@
 
 
 Shape * InitializeRessort(Shape * str){
-	str->initialized=false;
 
 	int i,j;
 	double a=2*PI/N;
@@ -30,10 +29,6 @@ Shape * InitializeRessort(Shape * str){
 
 
 void DrawRessort(Shape * str, double *ptr_Mat){
-	if (str->initialized!=true)
-	{
-		str->initialized=UpdateShape(str, ptr_Mat);
-	}
 	int i,j,k;
 	i=0;
 	j=0;

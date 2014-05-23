@@ -1,6 +1,5 @@
 
 Shape * InitializeTore(Shape *str){
-	str->initialized=false;
 
 	int i,j;
 	double a=2*PI/N;
@@ -45,10 +44,6 @@ Shape * InitializeTore(Shape *str){
 
 void DrawTore(Shape * str, double *ptr_Mat){
 
-	if (str->initialized!=true)
-	{
-		str->initialized=UpdateShape(str, ptr_Mat);
-	}
 	int i,j,k;
 	i=0;
 	j=0;
