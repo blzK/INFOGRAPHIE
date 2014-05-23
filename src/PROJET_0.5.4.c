@@ -11,8 +11,10 @@
 #include "tore.c"
 #include "pave.c"
 #include "cylindre.c"
-  
+ #include "para.c"
+      
 
+  
 
 
 
@@ -68,14 +70,12 @@ void initNodeMatrix(struct Node * str){
 
 	void initMatrix(HMat * mat){
 		mat->c=malloc(16*sizeof(double));
-
 		memset(mat->c, 0,16*sizeof(double));
-
 		g3x_MakeIdentity(mat->c);
-
-	/*g3x_MPrintHMat(str->Md.c);*/
-
+		/*g3x_MPrintHMat(str->Md.c);*/
 	}
+
+
 	void initMatrixZero(HMat * mat){
 		mat->c=malloc(16*sizeof(double));
 
@@ -83,9 +83,8 @@ void initNodeMatrix(struct Node * str){
 
 	}
 
-	void InitializeShape(Shape * str){
-		glColor4fv(orange);       
-		glTranslatef(5.,5.,-1);
+	/*void InitializeShape(Shape * str){
+
 		switch (str->ID){
 			case 0:
 			InitializePave(str);
@@ -97,11 +96,14 @@ void initNodeMatrix(struct Node * str){
 			InitializeCylindre(str);
 			break;
 			case 3:
-			InitializeTore(str);
+			InitializeTore(str, ratio);
 			break;
 			case 4: 
 			InitializeRessort(str);
 			break;
+			case 5: 
+			InitializePara(str);
+			break; 
 		}       
 	}
 
@@ -112,11 +114,13 @@ void initNodeMatrix(struct Node * str){
 	Shape sphere_canonical;
 	Shape tore_canonical;
 	Shape ressort_canonical;
+	Shape para_canonical;
 	Shape * ptr_pave_canonical= &pave_canonical;
 	Shape * ptr_cylindre_canonical=&cylindre_canonical;
 	Shape * ptr_sphere_canonical=&sphere_canonical;
 	Shape * ptr_tore_canonical=&tore_canonical;
 	Shape * ptr_ressort_canonical=&ressort_canonical;
+	Shape * ptr_para_canonical=&para_canonical;
 
 	void InitCanonical(){
 
@@ -127,12 +131,16 @@ void initNodeMatrix(struct Node * str){
 		cylindre_canonical.ID=2;
 		tore_canonical.ID=3;
 		ressort_canonical.ID=4;
+		para_canonical.ID=5;
 
-		InitializeShape(&pave_canonical); 
-		InitializeShape(&cylindre_canonical);
-		InitializeShape(&sphere_canonical);
-		InitializeShape(&tore_canonical);
-		InitializeShape(&ressort_canonical);
+		InitializePave(&pave_canonical); 
+		InitializeCylindre(&cylindre_canonical); 
+		InitializeSphere(&sphere_canonical);
+		InitializeTore(&tore_canonical,0.1);
+		InitializeRessort(&ressort_canonical);
+		InitializePara(&para_canonical);
+
+		
 
 
 	}
@@ -148,7 +156,8 @@ Il faut faire la multiplication avec la forme canonique !
 donc sauvegarder un type canonique...
 */
 
-bool UpdateShape2(Shape * str,  double *ptr_Mat){
+
+bool UpdateShape(Shape * str,  double *ptr_Mat){
 
 	G3Xpoint *v2=str->vrtx;
 	G3Xpoint *vn= str->norm;
@@ -176,10 +185,14 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 		vC=ptr_ressort_canonical->vrtx;
 		vCn=ptr_ressort_canonical->norm;
 		break;
+		case 5: 
+		vC=ptr_para_canonical->vrtx;
+		vCn=ptr_para_canonical->norm;
+		break;
 	} 
 
-	int q;      
-	q=0;
+	int q;         
+	q=0;   
 
 	G3Xpoint ResultPoint;
 	G3Xpoint ResultPoint2;
@@ -192,19 +205,21 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 		(*v2)[2]=ResultPoint[2];
 		v2++; 
 		vC++;
+		/*if(str->ID==5){
+			printf("%lf %lf  %lf\n", (*vC)[0],(*vC)[1],(*vC)[2]);
+		}*/
 	}
-
+  
 	for (q = 0; q < str->normNo; ++q){
 		g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
 		/*Transformation des normales*/
-		(*vn)[0]=ResultPoint2[0];
+		(*vn)[0]=ResultPoint2[0];            
 		(*vn)[1]=ResultPoint2[1];
 		(*vn)[2]=ResultPoint2[2];
 		vCn++;  
 		vn++;    
 
 	}
-/*printf("%f  %f  %f\n", *vC[0],vC[1],vC[2]);*/
 
 	return true; 
 
@@ -214,7 +229,7 @@ void DrawShape(Shape * str){
 
 	g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
 
-	printf("drawing shape %d\n", str->ID);
+	/*printf("drawing shape %d\n", str->ID);*/
 	switch (str->ID){
 		case 0: 
 		g3x_Material(vert,ambi,diff,spec,shin,1.);
@@ -225,7 +240,7 @@ void DrawShape(Shape * str){
 		DrawSphere(str);
 		break;
 		case 2:     
-		/*g3x_Material(orange,ambi,diff,spec,shin,1.);*/     
+		g3x_Material(rouge,ambi,diff,spec,shin,1.); 
 		DrawCylindre(str);
 		break;
 		case 3:
@@ -236,17 +251,21 @@ void DrawShape(Shape * str){
 		g3x_Material(cyan,ambi,diff,spec,shin,1.);
 		DrawRessort(str);   
 		break;
+		case 5:
+		g3x_Material(cyan,ambi,diff,spec,shin,1.);
+		DrawPara(str);   
+		break;
 	}        
 }
+    
 
-
-
+      
 
 void DrawLeaf(Node * str){ 
 	int i,size;
 	size=(str->shapesNo);
 	for(i=0;i<size;i++){
-		/*UpdateShape2(&(str->shapes)[i],ptr_currMat);*/
+		/*UpdateShape(&(str->shapes)[i],ptr_currMat);*/
 		DrawShape(&(str->shapes)[i]);
 	}
 
@@ -307,9 +326,8 @@ void UpdateLeaf(Node * str, double * ptr_Mat){
 	int i,size;
 	size=(str->shapesNo);
 /*Dessin*/ 
-	printf("shapes \n");
 	for(i=0;i<size;i++){ 
-		UpdateShape2(&(str->shapes)[i],ptr_Mat);
+		UpdateShape(&(str->shapes)[i],ptr_Mat);
 	}
 
 }
@@ -320,9 +338,9 @@ void UpdateLeaf(Node * str, double * ptr_Mat){
 Mise à jour des coordonnées après changement des matrices.
 
 Parcours l'arbre, et obtiens les matrices résultantes à chaque feuille.
-N0 | sur chacune de ses shapes UpdateShape2(MdN0) 
-N1 | UpdateShape2(MdN0 x MdN1)
-N2 | UpdateShape2(MdN0 x MdN1 x MdN1)
+N0 | sur chacune de ses shapes UpdateShape(MdN0) 
+N1 | UpdateShape(MdN0 x MdN1)
+N2 | UpdateShape(MdN0 x MdN1 x MdN1)
 
 temp=No;
 temp=N0xN1;
@@ -338,7 +356,7 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
 
 /*Affichage de la matrice courante*/
-	if(level==0){
+	/*if(level==0){
 		printf("********level = %d********\n",level );
 		int k;
 
@@ -346,21 +364,20 @@ void UpdateNode(Node * str, double * ptr_Mat){
 		{
 			printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
 		}
-	}
+	}*/
 	/*Si c'est un noeud*/
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		UpdateLeaf(str,ptr_Mat);
-	}
+		if(str->type==0){
+/*		printf("I'm an object %d\n",size );*/
+			UpdateLeaf(str,ptr_Mat);
+		}
 	/*Si c'est un macro-object*/
-	else if(str->type==1){
-		printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
+		else if(str->type==1){
+	/*	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
 		printf("Drawing macro-object %d\n",size );
-
+*/
 	/*Dessin*/
-		printf("shapes \n");
 		for(i=0;i<str->shapesNo;i++){
-			UpdateShape2(&(str->shapes)[i],ptr_Mat);
+			UpdateShape(&(str->shapes)[i],ptr_Mat);
 		}
 	/*Dessine ses fils*/
 		printf("Go to son \n");
@@ -374,7 +391,7 @@ void UpdateNode(Node * str, double * ptr_Mat){
 			level--;
 
 			/*Affichage de la matrice courante*/
-			if(level==0){
+			/*if(level==0){
 				printf("********level = %d********\n",level );
 				int k;
 
@@ -382,28 +399,24 @@ void UpdateNode(Node * str, double * ptr_Mat){
 				{
 					printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
 				}
+			}*/
 			}
+
+
 		}
-
-
-	}
-	else if(str->type==2){
+		else if(str->type==2){
 /*Si c'est un noeud*/
-		printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-		printf("Go to son \n");
-		Node *son;
+			Node *son;
 
-		for(i=0;i<(str->sonsNo);i++)
-		{
-			printf("test\n");
-			son=&((str->nodes)[i]);
-			printf("looking son %d type %d\n", i, son->type );
-			level++;
-			UpdateNode(son, ptr_Mat);
-			level--;
+			for(i=0;i<(str->sonsNo);i++)
+			{
+				son=&((str->nodes)[i]);
+				level++;
+				UpdateNode(son, ptr_Mat);
+				level--;
 
 			/*Affichage de la matrice courante*/
-			if(level==0){
+/*			if(level==0){
 				printf("********level = %d********\n",level );
 				int k;
 
@@ -411,203 +424,203 @@ void UpdateNode(Node * str, double * ptr_Mat){
 				{
 					printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
 				}
+		}*/	
+			}
+
+
+		}
+
+	/*Application de la matrice inverse*/
+		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
+	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	Shape * test(Shape * s){
+		float r,x,y,z,theta,phi,i,j;
+		float t;	
+
+		int n=4;
+		G3Xpoint *vt=s->vrtx;
+		for(i=0;i<N;i++){
+
+			for (j=0;j<P;j++)
+			{
+			/*t= pow(r,n)*sin(theta*n)*cos(phi*n);*/
+
+				r = sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] +(*vt)[2]*(*vt)[2]);
+				theta = atan2(sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] ) , (*vt)[2]);
+				phi = atan2((*vt)[1],(*vt)[0]); 
+			/*printf("\n %d %d %d %d %d ",t,r ,n, theta,phi);*/
+			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
+				(*vt)[0] = pow(r,n) * sin(theta*n) * cos(phi*n);
+				(*vt)[1] = pow(r,n) * sin(theta*n) * sin(phi*n);
+				(*vt)[2] = pow(r,n) * cos(theta*n);
+			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
+				vt++;
 			}
 		}
 
-
+		return s;
 	}
-
-	/*Application de la matrice inverse*/
-	g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
-	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
-
-}
-
-
-
-
-
-
-
-
-
-
-
-Shape * test(Shape * s){
-	float r,x,y,z,theta,phi,i,j;
-	float t;	
-	
-	int n=4;
-	G3Xpoint *vt=s->vrtx;
-	for(i=0;i<N;i++){
-
-		for (j=0;j<P;j++)
-		{
-			/*t= pow(r,n)*sin(theta*n)*cos(phi*n);*/
-
-			r = sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] +(*vt)[2]*(*vt)[2]);
-			theta = atan2(sqrt((*vt)[0]*(*vt)[0] + (*vt)[1]*(*vt)[1] ) , (*vt)[2]);
-			phi = atan2((*vt)[1],(*vt)[0]); 
-			/*printf("\n %d %d %d %d %d ",t,r ,n, theta,phi);*/
-			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
-			(*vt)[0] = pow(r,n) * sin(theta*n) * cos(phi*n);
-			(*vt)[1] = pow(r,n) * sin(theta*n) * sin(phi*n);
-			(*vt)[2] = pow(r,n) * cos(theta*n);
-			/*printf("\n %f %f %f !\n",(*vt)[0],(*vt)[1], (*vt)[2]);*/
-			vt++;
-		}
-	}
-
-	return s;
-}
 
 
 /*Doit aussi transformer les normales !*/
 
-void MakeTransformation(Node * outputNode, double translation[3], double rotation[3], double homothetie[3] ){
+	void MakeTransformation(Node * outputNode, double translation[3], double rotation[3], double homothetie[3] ){
 
 	/*Transformation directe*/
-	HMat temp;
-	HMat temp21;
-	HMat temp22;
-	HMat temp23;
-	HMat temp3;
-	initMatrix(&temp);
-	initMatrix(&temp21);
-	initMatrix(&temp22);
-	initMatrix(&temp23);
-	initMatrix(&temp3);
-	
-	if(translation!=NULL){
-		g3x_MakeTranslationXYZ(temp.c, translation[0],translation[1],translation[2]);
+		HMat temp;
+		HMat temp21;
+		HMat temp22;
+		HMat temp23;
+		HMat temp3;
+		initMatrix(&temp);
+		initMatrix(&temp21);
+		initMatrix(&temp22);
+		initMatrix(&temp23);
+		initMatrix(&temp3);
 
-		g3x_ProdHMat(temp.c, outputNode->Md.c,outputNode->Md.c);
+		if(translation!=NULL){
+			g3x_MakeTranslationXYZ(temp.c, translation[0],translation[1],translation[2]);
+
+			g3x_ProdHMat(temp.c, outputNode->Md.c,outputNode->Md.c);
 		/*g3x_ProdHMat(outputNode->Md.c,temp.c, outputNode->Md.c);*/
-	}
+		}
 
-	if(rotation!=NULL){
-		if(rotation[0]!=0.){
-			g3x_MakeRotationX(temp21.c, rotation[0]);
-			g3x_ProdHMat(temp21.c,outputNode->Md.c,outputNode->Md.c);
+		if(rotation!=NULL){
+			if(rotation[0]!=0.){
+				g3x_MakeRotationX(temp21.c, rotation[0]);
+				g3x_ProdHMat(temp21.c,outputNode->Md.c,outputNode->Md.c);
 			/*g3x_ProdHMat(outputNode->Md.c, temp21.c,outputNode->Md.c);*/
 
-		}
-		if(rotation[1]!=0.){
-			g3x_MakeRotationY(temp22.c,rotation[1]);
-			g3x_ProdHMat(temp22.c,outputNode->Md.c,outputNode->Md.c);
+			}
+			if(rotation[1]!=0.){
+				g3x_MakeRotationY(temp22.c,rotation[1]);
+				g3x_ProdHMat(temp22.c,outputNode->Md.c,outputNode->Md.c);
 			/*g3x_ProdHMat(outputNode->Md.c,temp22.c,outputNode->Md.c);*/
-		}
-		if(rotation[2]!=0.){
-			g3x_MakeRotationZ(temp23.c,rotation[2]);
-			g3x_ProdHMat(temp23.c,outputNode->Md.c,outputNode->Md.c);
+			}
+			if(rotation[2]!=0.){
+				g3x_MakeRotationZ(temp23.c,rotation[2]);
+				g3x_ProdHMat(temp23.c,outputNode->Md.c,outputNode->Md.c);
 			/*g3x_ProdHMat(outputNode->Md.c,temp23.c,outputNode->Md.c);*/
+			}
 		}
-	}
 
 
-	if(homothetie!=NULL){
+		if(homothetie!=NULL){
 
-		g3x_MakeHomothetieXYZ(temp3.c, homothetie[0],homothetie[1],homothetie[2]);
-		g3x_ProdHMat(temp3.c,outputNode->Md.c,outputNode->Md.c);
+			g3x_MakeHomothetieXYZ(temp3.c, homothetie[0],homothetie[1],homothetie[2]);
+			g3x_ProdHMat(temp3.c,outputNode->Md.c,outputNode->Md.c);
 				/*g3x_ProdHMat(outputNode->Md.c,temp3.c,outputNode->Md.c);*/
-	}
+		}
 
 
 	/*g3x_MakeRotationX(ptr_n1->Md.c, 1.5);*/
 
 	/*Transformation Inverse */
 
-	initMatrix(&temp);
-	initMatrix(&temp21);
-	initMatrix(&temp22);
-	initMatrix(&temp23);
-	initMatrix(&temp3);
+		initMatrix(&temp);
+		initMatrix(&temp21);
+		initMatrix(&temp22);
+		initMatrix(&temp23);
+		initMatrix(&temp3);
 
 
-	if(translation!=NULL){
-		g3x_MakeTranslationXYZ(temp.c, -translation[0],-translation[1],-translation[2]);
+		if(translation!=NULL){
+			g3x_MakeTranslationXYZ(temp.c, -translation[0],-translation[1],-translation[2]);
 		/*g3x_ProdHMat(temp.c, outputNode->Mi.c,outputNode->Mi.c);*/
-		g3x_ProdHMat(outputNode->Mi.c,temp.c, outputNode->Mi.c);
-	}
-	if(rotation!=NULL){
-		if(rotation[0]!=0.){
-			g3x_MakeRotationX(temp21.c, -rotation[0]);
+			g3x_ProdHMat(outputNode->Mi.c,temp.c, outputNode->Mi.c);
+		}
+		if(rotation!=NULL){
+			if(rotation[0]!=0.){
+				g3x_MakeRotationX(temp21.c, -rotation[0]);
 			/*g3x_ProdHMat(temp21.c,outputNode->Mi.c,outputNode->Mi.c);*/
-			g3x_ProdHMat(outputNode->Mi.c,temp21.c,outputNode->Mi.c);
-		}
-		if(rotation[1]!=0.){
-			g3x_MakeRotationY(temp22.c,-rotation[1]);
+				g3x_ProdHMat(outputNode->Mi.c,temp21.c,outputNode->Mi.c);
+			}
+			if(rotation[1]!=0.){
+				g3x_MakeRotationY(temp22.c,-rotation[1]);
 			/*g3x_ProdHMat(temp22.c,outputNode->Mi.c,outputNode->Mi.c);*/
-			g3x_ProdHMat(outputNode->Mi.c,temp22.c,outputNode->Mi.c);
-		}
+				g3x_ProdHMat(outputNode->Mi.c,temp22.c,outputNode->Mi.c);
+			}
 
-		if(rotation[2]!=0.){
-			g3x_MakeRotationZ(temp23.c,-rotation[2]);
+			if(rotation[2]!=0.){
+				g3x_MakeRotationZ(temp23.c,-rotation[2]);
 			/*g3x_ProdHMat(temp23.c,outputNode->Mi.c,outputNode->Mi.c);*/
-			g3x_ProdHMat(outputNode->Mi.c,temp23.c,outputNode->Mi.c);
+				g3x_ProdHMat(outputNode->Mi.c,temp23.c,outputNode->Mi.c);
+			}
 		}
-	}
 
-	if(homothetie!=NULL){
+		if(homothetie!=NULL){
 
-		g3x_MakeHomothetieXYZ(temp3.c, (double)1/homothetie[0],(double)1/homothetie[1],(double)1/homothetie[2]);
+			g3x_MakeHomothetieXYZ(temp3.c, (double)1/homothetie[0],(double)1/homothetie[1],(double)1/homothetie[2]);
 		/*g3x_ProdHMat(temp3.c,outputNode->Mi.c,outputNode->Mi.c);*/
-		g3x_ProdHMat(outputNode->Mi.c,temp3.c,outputNode->Mi.c);
+			g3x_ProdHMat(outputNode->Mi.c,temp3.c,outputNode->Mi.c);
+		}
+
 	}
 
-}
 
 
 
 
 
 
+	Shape chassis;
+	static Shape *ptr_chassis=&chassis;
 
-Shape chassis;
-static Shape *ptr_chassis=&chassis;
+	Shape tourelle;
+	static Shape *ptr_tourelle=&tourelle;
 
-Shape tourelle;
-static Shape *ptr_tourelle=&tourelle;
+	Shape canon;
+	static Shape *ptr_canon=&canon;
 
-Shape canon;
-static Shape *ptr_canon=&canon;
+	Shape roueGauche;
+	static Shape *ptr_roueGauche=&roueGauche;
 
-Shape roueGauche;
-static Shape *ptr_roueGauche=&roueGauche;
+	Shape roueDroite;
+	static Shape *ptr_roueDroite=&roueDroite;
 
-Shape roueDroite;
-static Shape *ptr_roueDroite=&roueDroite;
-
-struct Node scene;
-struct Node *ptr_sc= &scene;
+	struct Node scene;
+	struct Node *ptr_sc= &scene;
 
 
-struct Node n1;
-struct Node *ptr_n1= &n1;
-struct Node n2;
-struct Node *ptr_n2= &n2;
-struct Node n3;
-struct Node *ptr_n3= &n3;
-struct Node n4;
-struct Node *ptr_n4= &n4;
-struct Node n5;
-struct Node *ptr_n5= &n5;
-struct Node n6;
-struct Node *ptr_n6= &n6;
-struct Node n7;
-struct Node *ptr_n7= &n7;
-struct Node n8;
-struct Node *ptr_n8= &n8;
-
+	struct Node n1;
+	struct Node *ptr_n1= &n1;
+	struct Node n2;
+	struct Node *ptr_n2= &n2;
+	struct Node n3;
+	struct Node *ptr_n3= &n3;
+	struct Node n4;
+	struct Node *ptr_n4= &n4;
+	struct Node n5;
+	struct Node *ptr_n5= &n5;
+	struct Node n6;
+	struct Node *ptr_n6= &n6;
+	struct Node n7;
+	struct Node *ptr_n7= &n7;
+	struct Node n8;
+	struct Node *ptr_n8= &n8;
 
 
 
-void Init(void){
 
-	InitCanonical();
+	void Init(void){
 
-	ptr_currMat =currMat.c;
-	ptr_currMat=malloc(16*sizeof(double)); 
+		InitCanonical();
+
+		ptr_currMat =currMat.c;
+		ptr_currMat=malloc(16*sizeof(double)); 
 	/*R0[0]=0;
 	R0[1]=0;  
 	R0[2]=0;
@@ -618,7 +631,7 @@ void Init(void){
 	glGetDoublev( GL_MODELVIEW, ptr_currMat);
 */
 	/*pave*/
-	chassis.ID=0;
+	chassis.ID=5;
 	/*sphere*/
 	/*s1.ID=1;*/
 	/*cylindre*/
@@ -631,11 +644,11 @@ void Init(void){
 	/*r1.ID=4;*/
 
 
-	InitializeShape(ptr_chassis);
-	InitializeShape(ptr_tourelle);
-	InitializeShape(ptr_canon);
-	InitializeShape(ptr_roueGauche);
-	InitializeShape(ptr_roueDroite);
+	InitializePara(ptr_chassis);
+	InitializeCylindre(ptr_tourelle);
+	InitializeCylindre(ptr_canon);
+	InitializeTore(ptr_roueGauche,0.1);
+	InitializeTore(ptr_roueDroite,0.1);
 
 
 /*initScene(ptr_sc);*/
@@ -793,11 +806,12 @@ void Init(void){
 
 	double tr_n4[3]={0,0.5,0.5}; 
 	double rot_n4[3]= {1.57,0.,0.};
-	double homo_n4[3]={0.25,3,0.25};
+	double homo_n4[3]={0.15,2,0.15};
+
 	
 
 
-
+  
 	MakeTransformation(ptr_n1,trans_n1,NULL,NULL);
 
 	MakeTransformation(ptr_n3,NULL,NULL,homo_n3);
@@ -814,10 +828,10 @@ void Init(void){
 	
 	double trans_n2[3]={0,0,-0.2};
 	double rot_n2[3]= {PI/2,0,0};
-	double hom_n2[3]={2,0.7,0.3};
+	double hom_n2[3]={2,0.5,0.3};
 	double trans_n5[3]={0,0,-2};
 	double trans_n6[3]={0,0,2}; 
-
+   
 
 	/*MakeTransformation(ptr_n6,trans_n6,NULL,NULL);*/
 
@@ -838,7 +852,7 @@ void Init(void){
 
 	double n8_homo[3]={2,1.2,0.8};
 
-	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
+ 	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
 	
 		/*HMat anim;*/
 	/*initMatrix(&anim); 
@@ -986,8 +1000,10 @@ d double
 }
 HMat temp;
 
+float i=0;
+
 void Anim(void)
-{
+{  
 
 	/*HMat temp;
 	HMat temp2;
@@ -1004,25 +1020,27 @@ void Anim(void)
 */
 
 
-	double rot_anim[3]= {0,0,0.01};
+	double rot_anim[3]= {0,0,0.02};
 	MakeTransformation(ptr_n1,NULL,rot_anim,NULL);
+	i+=0.1;
+	/*double rot_anim[3]= {0,0,0.01};
+	MakeTransformation(ptr_n1,NULL,rot_anim,NULL);
+*/
 
-	double tr_anim[3]= {0.01,0,0};
-	MakeTransformation(ptr_sc,tr_anim,NULL,NULL);	
+
+	
+	/*double tr_anim[3]= {0.4*cos(i),0.4*sin(i),0};
+	printf("%f  :  %f\n", cos(i), sin(i) );
+	MakeTransformation(ptr_sc,tr_anim,NULL,NULL);
+	
+
+	/*double rot_sc[3]= {0,0,0.02};
+	MakeTransformation(ptr_sc,NULL,rot_sc,NULL);
+*/
 	HMat anim;
 	initMatrix(&anim); 
 	UpdateNode(ptr_sc,anim.c);
 
-/*Affichage matrice*/
-	/*DrawNodes(ptr_sc,ptr_currMat);*/
-	/*
-	int i;
-
-	for (i = 0; i < 16; ++i)
-	{
-		printf("Matrice directe i = %d -> %f\n", i, ptr_n3->Md.c[i]);
-	}
-*/
 }
 
 
@@ -1039,10 +1057,10 @@ static void Dessin(void)
 	/*HMat anim;
 	initMatrix(&anim);
 	/*g3x_MakeIdentity(anim.c);*/ 
-
-	printf("Entering DrawNodes\n");
+	glPointSize(r);  
+/*	printf("Entering DrawNodes\n");*/
 	DrawNodes(ptr_sc);
-	printf("Exiting DrawNodes\n");
+	/*printf("Exiting DrawNodes\n");*/
 
 	/*glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.); */ 
@@ -1052,8 +1070,8 @@ static void Dessin(void)
 
 
 /*
-	glPointSize(r);  
-		/*glColor4fv(rouge); 
+	 
+		/*glColor4fv(rouge);   
 			glColor4fv(orange);  
 	g3x_Material(orange,ambi, diff,spec,shin,1.);  
 */
@@ -1148,19 +1166,21 @@ int main(int argc, char** argv)
   /* param. géométrique de la caméra. cf. gluLookAt(...) */
 	g3x_SetPerspective(40.,100.,1.);
   /* position, orientation de la caméra */
+	/*g3x_SetCameraSpheric(0.25*PI,+0.25*PI,20.,(G3Xpoint){0.,0.,0.});*/
 	g3x_SetCameraSpheric(0.25*PI,+0.25*PI,6.,(G3Xpoint){0.,0.,0.});
-
   /* fixe les param. colorimétriques du spot lumineux */
 	/* lumiere blanche (c'est les valeurs par defaut)   */	
 	g3x_SetLightAmbient (1,1.,1.);
 	g3x_SetLightDiffuse (1.,1.,1.);
-	g3x_SetLightSpecular(1.,1.,1.);
+	g3x_SetLightSpecular(1.,1.,1.);     
 
   /* fixe la position et la direction du spot lumineux */
 	/* (c'est les valeurs par defaut)                    */	
-	g3x_SetLightPosition (0.,0.,10.);
+	/*g3x_SetLightPosition (0.,0.,10.);
 	g3x_SetLightDirection( 0, 0, -1);  
-
+*/
+	g3x_SetLightPosition (0.,10.,10.);
+	g3x_SetLightDirection( 0, 0, 0);  
 
   /* définition des fonctions */
   g3x_SetExitFunction(Exit  );     /* la fonction de sortie */
@@ -1175,3 +1195,4 @@ int main(int argc, char** argv)
 	return g3x_MainStart();
   /* rien après ça */  
 }
+

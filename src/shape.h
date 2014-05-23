@@ -12,6 +12,7 @@ typedef struct Shape
 	double ambi, diff, spec, shine, alpha; /*materiau*/
 	int pointNo; /*Nombre de vertex*/
 	int normNo; /*Nombre de normales*/
+	double ratio;
 } Shape;
 
 

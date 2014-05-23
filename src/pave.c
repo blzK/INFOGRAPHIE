@@ -98,24 +98,6 @@ Shape * InitializePave(Shape * str){
 	return str;
 }
 
-/*void InitializePaveTransformation(Shape * str,  double *ptr_Mat){
-	G3Xpoint *v2=str->vrtx;
-	G3Xpoint *vn=str->norm;
-	int q;
-	q=0;
-
-G3Xpoint ResultPoint;
-
-for (q = 0; q < 8; ++q){
-	
-	g3x_ProdHMatPoint(ptr_Mat, *v2, ResultPoint);
-	(*v2)[0]=ResultPoint[0];
-	(*v2)[1]=ResultPoint[1];
-	(*v2)[2]=ResultPoint[2];
-	v2++;
-}
-initialized=true;
-}*/
 
 void DrawPave(Shape * str){
 

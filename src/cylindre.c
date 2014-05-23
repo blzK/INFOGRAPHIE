@@ -13,6 +13,7 @@ Shape * InitializeCylindre(Shape * str){
 	memset(str->norm, 0,N*P*sizeof(G3Xvector));
 	G3Xpoint *vt=str->vrtx;  
 	G3Xvector *vn=str->norm;
+
 	for(i=0;i<N;i++)
 	{
 
@@ -32,8 +33,10 @@ Shape * InitializeCylindre(Shape * str){
 		}
 
 	}
+
 	return str;
 }
+
 
 void DrawCylindre(Shape * str){
 
@@ -47,10 +50,10 @@ void DrawCylindre(Shape * str){
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE TORE*/
-
-
-	glBegin(GL_POINTS);
+	glPointSize(0); 
 	glDisable(GL_LIGHTING);
+/*	glBegin(GL_POINTS);
+	glPointSize(0); 
 	for(i=0;i<N-stepn;i+=stepn){
 
 		for(j=0;j<P-stepp;j+=stepp){
@@ -58,8 +61,8 @@ void DrawCylindre(Shape * str){
 
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
-			glVertex3dv(str->vrtx[k]);
-			glNormal3dv(str->vrtx[k]);
+	/*		glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
 
 		}
 
@@ -67,16 +70,13 @@ void DrawCylindre(Shape * str){
 	glEnd();
 
 	/*TEXTURE CYLINDRE*/
-	
-	glBegin(GL_QUADS);
 	glEnable(GL_LIGHTING);
-	g3x_Material(orange,ambi,diff,spec,shin,1.);
+	glBegin(GL_QUADS);
+	
 	
 
 	for(i=0;i<N-stepn;i+=stepn){
 		for(j=0;j<P-stepp;j+=stepp){
-
-
 
 			k = i*P+j;
 			glNormal3dv(str->norm[k]);
@@ -127,7 +127,7 @@ void DrawCylindre(Shape * str){
 	glVertex3dv(str->vrtx[k]);
 
 	
-	glDisable(GL_LIGHTING);
+	
 
 	glEnd();
 
@@ -135,10 +135,9 @@ void DrawCylindre(Shape * str){
 	/*g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
 	/* Socle : cercle pour le bas du cylindre */
 
-
-	glBegin(GL_POLYGON);
 	glEnable(GL_LIGHTING);
-	g3x_Material(vert,ambi,diff,spec,shin,1.);
+	glBegin(GL_POLYGON);
+	
 	for(i = 0; i < N-stepn; i+= stepn)
 	{
 		/*i*p+j*/
@@ -151,7 +150,7 @@ void DrawCylindre(Shape * str){
 	}
 	glNormal3dv(str->norm[(N - stepn)*P + j%P]);
 	glVertex3dv(str->vrtx[(N - stepn)*P + j%P]);
-	glDisable(GL_LIGHTING);
+	
 	glEnd();
 
 
