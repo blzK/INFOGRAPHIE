@@ -41,6 +41,8 @@ Shape * InitializeTore(Shape *str){
 	return str;
 }
 
+
+
 void DrawTore(Shape * str, double *ptr_Mat){
 
 	if (str->initialized!=true)
@@ -74,13 +76,29 @@ void DrawTore(Shape * str, double *ptr_Mat){
 
 	/*TEXTURE TORE*/
 	glBegin(GL_QUADS);
+	glEnable(GL_LIGHTING);
+	for(i=0;i<N-stepn;i+=stepn){
+		for(j=0;j<P-stepp;j+=stepp){
 
-	for(i=0;i<N;i+=stepn){
-		for(j=0;j<P;j+=stepp){
-			glVertex3dv(str->vrtx[i*N+j]);
+			
+			/*glVertex3dv(str->vrtx[i*N+j]);
 			glVertex3dv(str->vrtx[i*N+j+stepp]);
 			glVertex3dv(str->vrtx[(i+stepn)*N+j+stepp]);
 			glVertex3dv(str->vrtx[(i+stepn)*N+j]);
+
+*/
+			k = i*P+j;
+			glVertex3dv(str->vrtx[k]);
+
+			k = i*P + (j+stepp);
+			glVertex3dv(str->vrtx[k]);
+
+			k = (i+stepn)*P+(j+stepp);
+			glVertex3dv(str->vrtx[k]);
+
+			k = (i+stepn)*P + j; 
+			glVertex3dv(str->vrtx[k]);
+
 
 			if(i%4){
 
@@ -92,18 +110,37 @@ void DrawTore(Shape * str, double *ptr_Mat){
 
 	}
 
-	glColor4fv(rouge);
+	/*Raccordement*/
+
+	/*glColor4fv(rouge);*/
 	g3x_Material(rouge,ambi,diff,spec,shin,1.);
-	i=0;
+	
 
 	for(j=0;j<P;j+=stepp){
-		glVertex3dv(str->vrtx[N*P+j]);
+	/*	glVertex3dv(str->vrtx[N*P+j]);
 		glVertex3dv(str->vrtx[N*P+j+stepp]);
 		glVertex3dv(str->vrtx[(stepn)*N+j+stepp]);
-		glVertex3dv(str->vrtx[(stepn)*N+j]);
+		glVertex3dv(str->vrtx[(stepn)*N+j]);*/
+
+		i=20*stepn;
+		k = i*P+j;
+		glVertex3dv(str->vrtx[k]);
+
+		k = i*P+j;
+		glVertex3dv(str->vrtx[k]);
+
+		i=N-2*stepn;
+		k = i*P+j;
+		glVertex3dv(str->vrtx[k]);
+
+		k = i*P+j;
+		glVertex3dv(str->vrtx[k]);
+
+		if(i%4){
+		}
+		glDisable(GL_LIGHTING);
+		glEnd();
+
+
 	}
-
-	glEnd();
-
-
 }

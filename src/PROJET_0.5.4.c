@@ -34,8 +34,8 @@ typedef struct Node{
 	struct Node * nodes;
 	struct Shape * shapes;
 	int type;/*0 : feuille, 1 : macro-object, 2 : noeud */
-	int shapesNo; /*Nombre de fils*/
-	int sonsNo;
+	int shapesNo; 
+	int sonsNo;/*Nombre de fils*/
   HMat Md, Mi, Mn; /*Matrices 4x4 directe, inverse, normale*/
 } Node;
 
@@ -76,6 +76,12 @@ void initNodeMatrix(struct Node * str){
 	/*g3x_MPrintHMat(str->Md.c);*/
 
 	}
+	void initMatrixZero(HMat * mat){
+		mat->c=malloc(16*sizeof(double));
+
+		memset(mat->c, 0,16*sizeof(double));
+
+	}
 
 	void InitializeShape(Shape * str){
 		glColor4fv(orange);       
@@ -93,10 +99,10 @@ void initNodeMatrix(struct Node * str){
 			case 3:
 			InitializeTore(str);
 			break;
-			case 4:
+			case 4: 
 			InitializeRessort(str);
 			break;
-		} 
+		}       
 	}
 
 
@@ -204,37 +210,31 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 
 }  
 
-void DrawShape(Shape * str){
-/*	glColor4fv(orange); */
-	/*G3Xpoint R1;*/
+void DrawShape(Shape * str, double * ptr_Mat){
 
-	/*g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);*/
-/*g3x_ProdHMatPoint(ptr_currMat, str->Md.c, ptr_currMat)*/
-	/*g3x_ProdHMatPoint(ptr_currMat, *ptr_currRep, R1);*/
-
-	/*UpdateShape2(str,ptr_currMat);*/
+	g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
 
 	printf("drawing shape %d\n", str->ID);
 	switch (str->ID){
 		case 0: 
 		g3x_Material(vert,ambi,diff,spec,shin,1.);
-		DrawPave(str,ptr_currMat);
+		DrawPave(str,ptr_Mat);
 		break;
 		case 1:  
 		g3x_Material(rouge,ambi,diff,spec,shin,1.);
-		DrawSphere(str,ptr_currMat);
+		DrawSphere(str,ptr_Mat);
 		break;
 		case 2:     
 		/*g3x_Material(orange,ambi,diff,spec,shin,1.);*/     
-		DrawCylindre(str,ptr_currMat);
+		DrawCylindre(str,ptr_Mat);
 		break;
 		case 3:
 		g3x_Material(jaune,ambi,diff,spec,shin,1.);
-		DrawTore(str,ptr_currMat);
+		DrawTore(str,ptr_Mat);
 		break;
 		case 4:
 		g3x_Material(cyan,ambi,diff,spec,shin,1.);
-		DrawRessort(str,ptr_currMat);   
+		DrawRessort(str,ptr_Mat);   
 		break;
 	}        
 }
@@ -242,125 +242,128 @@ void DrawShape(Shape * str){
 
 
 
-void DrawLeaf(Node * str){ 
+void DrawLeaf(Node * str, double * ptr_Mat){ 
 	int i,size;
-	printf("Entering DrawLeaf\n");
 	size=(str->shapesNo);
-
-	printf("%d\n", size);
-/*Application de la matrice directe*/
-	/*glPushMatrix();*/
-
-
-	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
-
-
-/*Dessin*/
-	printf("shapes \n");
 	for(i=0;i<size;i++){
 		/*UpdateShape2(&(str->shapes)[i],ptr_currMat);*/
-		DrawShape(&(str->shapes)[i]);
+		DrawShape(&(str->shapes)[i], ptr_Mat);
 	}
 
-/*Application de la matrice inverse*/
-	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
-
-
 }
+
+
 
 void DrawsubNode(Node * str){
 
 }
 
+int level=0;
 
 void DrawNodes(Node * str, double * ptr_Mat){
 	int size,i;
 
 	size=str->sonsNo;
+/*Affichage de la matrice courante*/
+	printf("********level = %d********\n",level );
+	int k;
 
-
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		DrawLeaf(str);
-
+	for (k = 0; k < 16; ++k)
+	{
+		printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
 	}
-else if(str->type==1){/*Si c'est un macro-object*/
-	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
-	printf("Drawing macro-object %d\n",size );
-/*Application de la matrice directe*/
-	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
-	g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);
-
-/*Dessin*/
-	printf("shapes \n");
-	for(i=0;i<str->shapesNo;i++){
-		DrawShape(&(str->shapes)[i]);
-	}
-/*Dessine ses fils*/
-	printf("Go to son \n");
-	Node *son;
-	for(i=0;i<(str->sonsNo);i++){
-		printf("test\n");
-		son=&((str->nodes)[i]);
-		printf("looking son %d type %d\n", i, son->type );
-		DrawNodes(son,ptr_Mat);
-
+	/*Si c'est un Objet*/
+	if(str->type==0)
+	{
+		printf("level : %d I'm an object i have %d sons and %d shapes\n",level, size,str->shapesNo );
+		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
+		DrawLeaf(str, ptr_Mat);
+		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 	}
 
-/*Application de la matrice inverse*/
-/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
-	g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);
+	/*Si c'est un Macro-Objet*/
+	else if(str->type==1)
+	{
+		printf("level : %d  I'm a SubNode i have %d sons and %d shapes my type is %d\n",level, size,str->shapesNo, str->type );
+		printf("Drawing macro-object %d\n",size );
+
+		/*Application de la matrice directe*/
+		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
+		/*g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);*/
+
+		/*Dessin*/
+		DrawLeaf(str, ptr_Mat);
+		/*Dessine ses fils*/
+		printf("Go to son \n");
+		Node *son;
+		for(i=0;i<(str->sonsNo);i++){
+			printf("test\n");
+			son=&((str->nodes)[i]);
+			printf("looking son %d type %d\n", i, son->type );
+			level++;
+			DrawNodes(son,ptr_Mat);
+			level--;
+		}
+
+		/*Application de la matrice inverse*/
+		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
+		/*g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);*/
+	}
+	/*Si c'est un noeud*/
+	else if(str->type==2)
+	{
+		printf("level : %d  I'm a Node i have %d sons and my type is %d\n",level, size, str->type );
+		printf("Go to son \n");
+		Node *son;
+
+		/*Application de la matrice directe*/
+		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
+		/*g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);*/
+
+		for(i=0;i<(str->sonsNo);i++)
+		{
+			printf("test\n");
+			son=&((str->nodes)[i]);
+			printf("looking son %d type %d\n", i, son->type );
+			level++;
+			DrawNodes(son, ptr_Mat);
+			level--;
+		}
+
+		/*Application de la matrice inverse*/
+		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
+		/*g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);*/
+	}
 
 }
-else if(str->type==2){/*Si c'est un noeud*/
-printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-printf("Go to son \n");
-Node *son;
-
-/*Application de la matrice directe*/
-	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
-g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);
-
-
-for(i=0;i<(str->sonsNo);i++){
-	printf("test\n");
-	son=&((str->nodes)[i]);
-	printf("looking son %d type %d\n", i, son->type );
-	DrawNodes(son, ptr_Mat);
-}
-
-/*Application de la matrice inverse*/
-/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
-g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);
-}
-}
 
 
 
-void UpdateLeaf(Node * str, double * ptr_Mat){ 
+void UpdateLeaf(Node * str, double * ptr_Mat){
+
 	int i,size;
-	printf("Entering DrawLeaf\n");
 	size=(str->shapesNo);
-
-	printf("%d\n", size);
-/*Application de la matrice directe*/
-	/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
-	/*ok g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
-
-
 /*Dessin*/ 
 	printf("shapes \n");
 	for(i=0;i<size;i++){ 
-		/*UpdateShape2(&(str->shapes)[i],ptr_currMat);*/
 		UpdateShape2(&(str->shapes)[i],ptr_Mat);
 	}
 
-/*Application de la matrice inverse*/
-	/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);*/
-	/*ok g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);*/
-
-
 }
+
+
+
+/*
+Mise à jour des coordonnées après changement des matrices.
+
+Parcours l'arbre, et obtiens les matrices résultantes à chaque feuille.
+N0 | sur chacune de ses shapes UpdateShape2(MdN0) 
+N1 | UpdateShape2(MdN0 x MdN1)
+N2 | UpdateShape2(MdN0 x MdN1 x MdN1)
+
+temp=No;
+temp=N0xN1;
+*/
 
 
 void UpdateNode(Node * str, double * ptr_Mat){
@@ -381,16 +384,16 @@ void UpdateNode(Node * str, double * ptr_Mat){
 else if(str->type==1){/*Si c'est un macro-object*/
 	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
 	printf("Drawing macro-object %d\n",size );
-/*Application de la matrice directe*/
+	/*Application de la matrice directe*/
 	g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
 	/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
 
-/*Dessin*/
+	/*Dessin*/
 	printf("shapes \n");
 	for(i=0;i<str->shapesNo;i++){
 		UpdateShape2(&(str->shapes)[i],ptr_Mat);
 	}
-/*Dessine ses fils*/
+	/*Dessine ses fils*/
 	printf("Go to son \n");
 	Node *son;
 	for(i=0;i<(str->sonsNo);i++){
@@ -401,7 +404,7 @@ else if(str->type==1){/*Si c'est un macro-object*/
 
 	}
 
-/*Application de la matrice inverse*/
+	/*Application de la matrice inverse*/
 	g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
 
@@ -411,15 +414,15 @@ printf("I'm a Node my size is %d my type is %d\n",size, str->type );
 printf("Go to son \n");
 Node *son;
 /*Application de la matrice directe*/
-g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
-/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
+/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
+g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);
 
-for(i=0;i<(str->sonsNo);i++){
+for(i=0;i<(str->sonsNo);i++)
+{
 	printf("test\n");
 	son=&((str->nodes)[i]);
 	printf("looking son %d type %d\n", i, son->type );
 	UpdateNode(son, ptr_Mat);
-
 }
 
 /*Application de la matrice inverse*/
@@ -429,81 +432,6 @@ g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 }
 
 }
-
-
-
-
-
-
-
-
-/*
-Mise à jour des coordonnées après changement des matrices.
-
-Parcours l'arbre, et obtiens les matrices résultantes à chaque feuille.
-N0 | sur chacune de ses shapes UpdateShape2(MdN0) 
-N1 | UpdateShape2(MdN0 x MdN1)
-N2 | UpdateShape2(MdN0 x MdN1 x MdN1)
-
-temp=No;
-temp=N0xN1;
-*/
-
-
-/*void UpdateScene(Node * str){
-
-	g3x_MakeIdentity(ptr_currMat);
-
-	int size,i;
-
-	size=str->sonsNo;
-
-	HMat resultMat;
-	g3x_ProdHMat(resultMat.c, str->Md.c, resultMat.c);
-
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		
-	}
-	else if(str->type==1){/*Si c'est un macro-object*/
-/*	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
-
-	g3x_ProdHMat(ptr_currMat, str->Md.c, ptr_currMat);
-
-/*Dessin*/
-/*	printf("shapes \n");
-	for(i=0;i<str->shapesNo;i++){
-		DrawShape(&(str->shapes)[i]);
-	}
-/*Dessine ses fils*/
-/*	printf("Go to son \n");
-	Node *son;
-	for(i=0;i<(str->sonsNo);i++){
-		printf("test\n");
-		son=&((str->nodes)[i]);
-		printf("looking son  %d type %d\n", i, son->type );
-		DrawNodes(son);
-
-	}
-
-	/*Application de la matrice inverse*/
-/*	g3x_ProdHMat(ptr_currMat,str->Mi.c,ptr_currMat);
-}
-/*	else if(str->type==2){/*Si c'est un noeud*/
-/*printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-printf("Go to son \n");
-Node *son;
-for(i=0;i<(str->sonsNo);i++){
-	printf("test\n");
-	son=&((str->nodes)[i]);
-	printf("looking son  %d type %d\n", i, son->type );
-	DrawNodes(son);
-
-}
-}
-}
-*/
-
 
 
 
@@ -543,10 +471,6 @@ Shape * test(Shape * s){
 	return s;
 }
 
-void exploreTree(){
-
-}
-
 
 /*Doit aussi transformer les normales !*/
 
@@ -567,22 +491,26 @@ void MakeTransformation(Node * outputNode, double translation[3], double rotatio
 	if(translation!=NULL){
 		g3x_MakeTranslationXYZ(temp.c, translation[0],translation[1],translation[2]);
 
-		g3x_ProdHMat(temp.c, outputNode->Md.c,outputNode->Md.c);
+		/*g3x_ProdHMat(temp.c, outputNode->Md.c,outputNode->Md.c);*/
+		g3x_ProdHMat(outputNode->Md.c,temp.c, outputNode->Md.c);
 	}
 
 	if(rotation!=NULL){
 		if(rotation[0]!=0.){
 			g3x_MakeRotationX(temp21.c, rotation[0]);
-			g3x_ProdHMat(temp21.c,outputNode->Md.c,outputNode->Md.c);
+			/*g3x_ProdHMat(temp21.c,outputNode->Md.c,outputNode->Md.c);*/
+			g3x_ProdHMat(outputNode->Md.c, temp21.c,outputNode->Md.c);
 
 		}
 		if(rotation[1]!=0.){
 			g3x_MakeRotationY(temp22.c,rotation[1]);
-			g3x_ProdHMat(temp22.c,outputNode->Md.c,outputNode->Md.c);
+			/*g3x_ProdHMat(temp22.c,outputNode->Md.c,outputNode->Md.c);*/
+			g3x_ProdHMat(outputNode->Md.c,temp22.c,outputNode->Md.c);
 		}
 		if(rotation[2]!=0.){
 			g3x_MakeRotationZ(temp23.c,rotation[2]);
-			g3x_ProdHMat(temp23.c,outputNode->Md.c,outputNode->Md.c);
+			/*g3x_ProdHMat(temp23.c,outputNode->Md.c,outputNode->Md.c);*/
+			g3x_ProdHMat(outputNode->Md.c,temp23.c,outputNode->Md.c);
 		}
 	}
 
@@ -590,7 +518,8 @@ void MakeTransformation(Node * outputNode, double translation[3], double rotatio
 	if(homothetie!=NULL){
 
 		g3x_MakeHomothetieXYZ(temp3.c, homothetie[0],homothetie[1],homothetie[2]);
-		g3x_ProdHMat(temp3.c,outputNode->Md.c,outputNode->Md.c);
+		/*g3x_ProdHMat(temp3.c,outputNode->Md.c,outputNode->Md.c);*/
+		g3x_ProdHMat(outputNode->Md.c,temp3.c,outputNode->Md.c);
 	}
 
 
@@ -607,28 +536,33 @@ void MakeTransformation(Node * outputNode, double translation[3], double rotatio
 
 	if(translation!=NULL){
 		g3x_MakeTranslationXYZ(temp.c, -translation[0],-translation[1],-translation[2]);
-		g3x_ProdHMat(temp.c, outputNode->Mi.c,outputNode->Mi.c);
+		/*g3x_ProdHMat(temp.c, outputNode->Mi.c,outputNode->Mi.c);*/
+		g3x_ProdHMat(outputNode->Mi.c,temp.c, outputNode->Mi.c);
 	}
 	if(rotation!=NULL){
 		if(rotation[0]!=0.){
 			g3x_MakeRotationX(temp21.c, -rotation[0]);
-			g3x_ProdHMat(temp21.c,outputNode->Mi.c,outputNode->Mi.c);
+			/*g3x_ProdHMat(temp21.c,outputNode->Mi.c,outputNode->Mi.c);*/
+			g3x_ProdHMat(outputNode->Mi.c,temp21.c,outputNode->Mi.c);
 		}
 		if(rotation[1]!=0.){
 			g3x_MakeRotationY(temp22.c,-rotation[1]);
-			g3x_ProdHMat(temp22.c,outputNode->Mi.c,outputNode->Mi.c);
+			/*g3x_ProdHMat(temp22.c,outputNode->Mi.c,outputNode->Mi.c);*/
+			g3x_ProdHMat(outputNode->Mi.c,temp22.c,outputNode->Mi.c);
 		}
 
 		if(rotation[2]!=0.){
 			g3x_MakeRotationZ(temp23.c,-rotation[2]);
-			g3x_ProdHMat(temp23.c,outputNode->Mi.c,outputNode->Mi.c);
+			/*g3x_ProdHMat(temp23.c,outputNode->Mi.c,outputNode->Mi.c);*/
+			g3x_ProdHMat(outputNode->Mi.c,temp23.c,outputNode->Mi.c);
 		}
 	}
 
 	if(homothetie!=NULL){
 
 		g3x_MakeHomothetieXYZ(temp3.c, (double)1/homothetie[0],(double)1/homothetie[1],(double)1/homothetie[2]);
-		g3x_ProdHMat(temp3.c,outputNode->Mi.c,outputNode->Mi.c);
+		/*g3x_ProdHMat(temp3.c,outputNode->Mi.c,outputNode->Mi.c);*/
+		g3x_ProdHMat(outputNode->Mi.c,temp3.c,outputNode->Mi.c);
 	}
 
 }
@@ -656,6 +590,8 @@ static Shape *ptr_roueDroite=&roueDroite;
 
 struct Node scene;
 struct Node *ptr_sc= &scene;
+
+
 struct Node n1;
 struct Node *ptr_n1= &n1;
 struct Node n2;
@@ -689,8 +625,8 @@ void Init(void){
 	memset(ptr_currMat, 0, 16*sizeof(double));
 	g3x_MakeIdentity(ptr_currMat);
 	/*glMatrixMode(GL_MODELVIEW);
-	glGetDoublev( GL_MODELVIEW, ptr_currMat);*/
-
+	glGetDoublev( GL_MODELVIEW, ptr_currMat);
+*/
 	/*pave*/
 	chassis.ID=0;
 	/*sphere*/
@@ -812,11 +748,12 @@ void Init(void){
 	ptr_sc->nodes=(Node *)malloc(3*sizeof(Node));
 	ptr_sc->sonsNo=3;
 	ptr_sc->shapesNo=0;
-	ptr_sc->type=1;
-	ptr_sc->nodes[0]=n1;       
-	ptr_sc->nodes[1]=n2;
-	ptr_sc->nodes[2]=n7;
+	ptr_sc->type=2;
+	ptr_sc->nodes[0]=n7;
+	ptr_sc->nodes[1]=n1;       
+	ptr_sc->nodes[2]=n2;
 	initNodeMatrix(ptr_sc);
+
 
 
 /***************************************/
@@ -830,7 +767,7 @@ void Init(void){
 
 
 /*Transformation canon et  tourelle*/
-	double trans[3]={0,0,2};
+	/*double trans[3]={0,0,2};
 	double rot[3]= {1.57,0,0};
 	double homo[3]={0.1,0.1,10};
 
@@ -847,15 +784,6 @@ void Init(void){
 	/*  OU EST CE QUE LA SCENE N'EST PAS MISE A JOUR ????? */
 
 
-	/*MakeTransformation(ptr_n1,NULL,rot,NULL);
-	MakeTransformation(ptr_n4,trans,NULL,NULL);
-	MakeTransformation(ptr_n3,trans2,NULL,NULL);
-	*/
-/*	MakeTransformation(ptr_n4,NULL,rot,NULL);
-
-*/
-
-	
 
 
 	/* MISE A JOUR DE LA SCENE ?**/
@@ -863,44 +791,74 @@ void Init(void){
 	initMatrix(&id);
 	UpdateNode(ptr_sc, id.c);*/
 
+
+
+	HMat anim;  
+
 /*Ceanon n4 + tourelle n3*/
-	double trans_n1[3]={0,0,3.};
-	double trans_n4[3]={0,0,0.4}; 
+
+	double trans_n1[3]={0,0,0.5};
+
+	double homo_n3[3]={1.,1.,0.3};
+
+	double tr_n4[3]={0,1,0.1}; 
 	double rot_n4[3]= {1.57,0.,0.};
-	double homo_n4[3]={0.25,0.25,4.};
-	double homo_n3[3]={1.,1.,1.};
+	double homo_n4[3]={0.25,4,0.25};
+	
 
 
 
-	/*MakeTransformation(ptr_n1,trans_n1,NULL,NULL);
+	MakeTransformation(ptr_n1,trans_n1,NULL,NULL);
+
+	MakeTransformation(ptr_n3,NULL,NULL,homo_n3);
+
+	MakeTransformation(ptr_n4,tr_n4,NULL,NULL);
 /*	MakeTransformation(ptr_n4,NULL,rot_n4,NULL);*/
+	MakeTransformation(ptr_n4,NULL,NULL,homo_n4);
 	
-/*	MakeTransformation(ptr_n3,NULL,NULL,homo_n3);*/
 	
 
-/*roues*/
-
-
+/*Transformation roue gauche n5+ roue droite n6 */
 
 
 	
+	double trans_n2[3]={0,0,-0.5};
+	double rot_n2[3]= {PI/2,0,0};
+	double hom_n2[3]={1,0.5,0.3};
+	double trans_n5[3]={0,0,-2};
+	double trans_n6[3]={0,0,2};
 
-	double trans_n5[3]={0,2,0};
-	double trans_n6[3]={0,-2,0};
-	/*MakeTransformation(ptr_n2,NULL,rot,NULL);
+
+	/*MakeTransformation(ptr_n6,trans_n6,NULL,NULL);*/
+
+	MakeTransformation(ptr_n2,NULL,NULL,hom_n2);
+	MakeTransformation(ptr_n2,NULL,rot_n2,NULL);
+	MakeTransformation(ptr_n2,trans_n2,NULL,NULL);
+
+
+	
 	MakeTransformation(ptr_n5,trans_n5,NULL,NULL);
 	MakeTransformation(ptr_n6,trans_n6,NULL,NULL);
+
+	/*initMatrix(&anim); 
+	UpdateNode(ptr_sc,anim.c);
 
 
 /*Chassis */
 
-	double n8_homo[3]={1.2,2.,0.8};
-/*	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
+	double n8_homo[3]={2,1.2,0.8};
+
+	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
+	
+		/*HMat anim;*/
+	/*initMatrix(&anim); 
+	UpdateNode(ptr_sc,anim.c);
+*/
 
 
 
 
-	HMat anim;
+/*	HMat anim;
 	initMatrix(&anim); 
 	UpdateNode(ptr_sc,anim.c);
 
@@ -954,7 +912,11 @@ On est obligé de passer par des matrices temporaires*/
 	g3x_ProdHMat(temp.c,temp3.c,temp.c);
 	g3x_ProdHMat(temp.c,ptr_n1->Md.c,ptr_n1->Md.c);
 
+
+
 	g3x_MakeRotationX(ptr_n1->Md.c, 1.5);
+
+
 
 	initMatrix(&temp);
 	initMatrix(&temp2);
@@ -969,32 +931,39 @@ On est obligé de passer par des matrices temporaires*/
 	HMat temp;
 	HMat temp2;
 	HMat temp3;
-	initMatrix(&temp);
+	/*initMatrix(&temp);
 	initMatrix(&temp2);
 	initMatrix(&temp3);
 
 /*Matrices directes n2 = roue gauche + roue droite */
 
-	initMatrix(&temp);
+	/*initMatrix(&temp);
 	initMatrix(&temp2);
 	initMatrix(&temp3);
-	g3x_MakeHomothetieXYZ(temp.c, 1,4,0.5);
-	g3x_MakeRotationY(temp.c, -PI);
+	/*g3x_MakeHomothetieXYZ(temp.c, 1,4,0.5);*/
+/*	g3x_MakeRotationY(temp.c, -PI/2);
 	g3x_MakeTranslationXYZ(temp3.c,0,0,-0.2);
-	g3x_ProdHMat(temp.c,temp2.c,temp.c);
-	g3x_ProdHMat(temp.c,temp3.c,ptr_n2->Md.c);
+	/*g3x_ProdHMat(temp.c,temp2.c,temp.c);
+	g3x_ProdHMat(temp.c,temp3.c,ptr_n2->Md.c);*/
+	/*g3x_ProdHMat(ptr_n2->Md.c,temp.c,ptr_n2->Md.c);
+	g3x_ProdHMat(ptr_n2->Md.c,temp2.c,ptr_n2->Md.c);
+	g3x_ProdHMat(ptr_n2->Md.c,temp3.c,ptr_n2->Md.c);
 	
 
 /*Matrices indirectes n2 = roue gauche + roue droite */
-
-	initMatrix(&temp);
+/*	initMatrix(&temp);
 	initMatrix(&temp2);
 	initMatrix(&temp3);
-	g3x_MakeHomothetieXYZ(temp.c, 1,0.25,2);
-	g3x_MakeRotationY(temp2.c, PI);
+	/*g3x_MakeHomothetieXYZ(temp.c, 1,0.25,2);*/
+	/*g3x_MakeRotationY(temp2.c, PI/2);
 	g3x_MakeTranslationXYZ(temp3.c,0,0,0.2);
-	g3x_ProdHMat(temp.c,temp2.c,temp.c);
-	g3x_ProdHMat(temp.c,temp3.c,ptr_n2->Mi.c);
+/*	g3x_ProdHMat(temp.c,temp2.c,temp.c);
+	g3x_ProdHMat(temp.c,temp3.c,ptr_n2->Mi.c);*/
+/*		g3x_ProdHMat(ptr_n2->Mi.c,temp.c,ptr_n2->Mi.c);
+	g3x_ProdHMat(ptr_n2->Mi.c,temp2.c,ptr_n2->Mi.c);
+	g3x_ProdHMat(ptr_n2->Mi.c,temp3.c,ptr_n2->Mi.c);
+
+
 
 
 
@@ -1008,9 +977,7 @@ On est obligé de passer par des matrices temporaires*/
 
 */
 
-	HMat anim;
-	initMatrix(&anim); 
-	UpdateNode(ptr_sc,anim.c);
+
 
 
 
@@ -1033,24 +1000,26 @@ HMat temp;
 void Anim(void)
 {
 
-	HMat temp;
+	/*HMat temp;
 	HMat temp2;
 	initMatrix(&temp);
 	initMatrix(&temp2);
 	g3x_MakeRotationZ(temp.c, 0.01);
 	g3x_MakeRotationZ(temp2.c, -0.01);
 	/*Tout rotation*/
-	g3x_ProdHMat(temp.c, ptr_sc->Md.c, ptr_sc->Md.c);
+/*	g3x_ProdHMat(temp.c, ptr_sc->Md.c, ptr_sc->Md.c);
 	g3x_ProdHMat(temp2.c, ptr_sc->Mi.c, ptr_sc->Mi.c);
 	/* Tourelle rotation*/
 	/*g3x_ProdHMat(temp.c, ptr_n1->Md.c, ptr_n1->Md.c);
 	g3x_ProdHMat(temp2.c, ptr_n1->Mi.c, ptr_n1->Mi.c);
 */
 
+
+	double rot_anim[3]= {0,0,0.01};
+	MakeTransformation(ptr_sc,NULL,rot_anim,NULL);
 	
 	HMat anim;
 	initMatrix(&anim); 
-	/*g3x_MakeIdentity(anim.c);*/
 	UpdateNode(ptr_sc,anim.c);
 
 /*Affichage matrice*/
@@ -1080,7 +1049,10 @@ static void Dessin(void)
 	initMatrix(&anim);
 	/*g3x_MakeIdentity(anim.c);*/ 
 
+	printf("Entering DrawNodes\n");
 	DrawNodes(ptr_sc, anim.c);
+	printf("Exiting DrawNodes\n");
+
 	/*glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.); */ 
 	/*g3x_(rouge,ambi,diff,spec,shin,1.);*/
@@ -1088,7 +1060,7 @@ static void Dessin(void)
 
 
 
-
+/*
 	glPointSize(r);  
 		/*glColor4fv(rouge); 
 			glColor4fv(orange);  
@@ -1123,11 +1095,11 @@ static void Dessin(void)
 	DrawShape(ptr_c1);
 */
 /* On dessine le Tore*/
-/*	glPopMatrix();
+	/*glPopMatrix();
 	glPushMatrix();
 	glTranslatef(3.,3.,-1); 
 	glScalef(0.3,.3,0.3); 
-	DrawShape(ptr_t1);
+	DrawShape(ptr_roueGauche,anim) ;*/
 
 /* On dessine le Ressort*/
 /*	glTranslatef(0.,-5.,-1);
