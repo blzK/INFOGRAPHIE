@@ -117,7 +117,7 @@ for (q = 0; q < 8; ++q){
 initialized=true;
 }*/
 
-void DrawPave(Shape * str,  double *ptr_Mat){
+void DrawPave(Shape * str){
 
 	int i,j,k,N2,P2,l;
 	i=0;

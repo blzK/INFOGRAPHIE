@@ -28,7 +28,7 @@ Shape * InitializeRessort(Shape * str){
 };
 
 
-void DrawRessort(Shape * str, double *ptr_Mat){
+void DrawRessort(Shape * str){
 	int i,j,k;
 	i=0;
 	j=0;

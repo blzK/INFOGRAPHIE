@@ -41,7 +41,7 @@ Shape * InitializeSphere(Shape * str){
 }
 
 
-void DrawSphere(Shape * str, double *ptr_Mat){
+void DrawSphere(Shape * str){
 
 
 	str->pointNo=N*P;

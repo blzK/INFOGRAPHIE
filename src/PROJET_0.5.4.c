@@ -210,7 +210,7 @@ bool UpdateShape2(Shape * str,  double *ptr_Mat){
 
 }  
 
-void DrawShape(Shape * str, double * ptr_Mat){
+void DrawShape(Shape * str){
 
 	g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
 
@@ -218,23 +218,23 @@ void DrawShape(Shape * str, double * ptr_Mat){
 	switch (str->ID){
 		case 0: 
 		g3x_Material(vert,ambi,diff,spec,shin,1.);
-		DrawPave(str,ptr_Mat);
+		DrawPave(str);
 		break;
 		case 1:  
 		g3x_Material(rouge,ambi,diff,spec,shin,1.);
-		DrawSphere(str,ptr_Mat);
+		DrawSphere(str);
 		break;
 		case 2:     
 		/*g3x_Material(orange,ambi,diff,spec,shin,1.);*/     
-		DrawCylindre(str,ptr_Mat);
+		DrawCylindre(str);
 		break;
 		case 3:
 		g3x_Material(jaune,ambi,diff,spec,shin,1.);
-		DrawTore(str,ptr_Mat);
+		DrawTore(str);
 		break;
 		case 4:
 		g3x_Material(cyan,ambi,diff,spec,shin,1.);
-		DrawRessort(str,ptr_Mat);   
+		DrawRessort(str);   
 		break;
 	}        
 }
@@ -247,7 +247,7 @@ void DrawLeaf(Node * str, double * ptr_Mat){
 	size=(str->shapesNo);
 	for(i=0;i<size;i++){
 		/*UpdateShape2(&(str->shapes)[i],ptr_currMat);*/
-		DrawShape(&(str->shapes)[i], ptr_Mat);
+		DrawShape(&(str->shapes)[i]);
 	}
 
 }
@@ -264,6 +264,10 @@ void DrawNodes(Node * str, double * ptr_Mat){
 	int size,i;
 
 	size=str->sonsNo;
+	/*Application de la matrice directe*/
+	g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
+		/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
+
 /*Affichage de la matrice courante*/
 	printf("********level = %d********\n",level );
 	int k;
@@ -276,9 +280,7 @@ void DrawNodes(Node * str, double * ptr_Mat){
 	if(str->type==0)
 	{
 		printf("level : %d I'm an object i have %d sons and %d shapes\n",level, size,str->shapesNo );
-		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
 		DrawLeaf(str, ptr_Mat);
-		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 	}
 
 	/*Si c'est un Macro-Objet*/
@@ -287,9 +289,6 @@ void DrawNodes(Node * str, double * ptr_Mat){
 		printf("level : %d  I'm a SubNode i have %d sons and %d shapes my type is %d\n",level, size,str->shapesNo, str->type );
 		printf("Drawing macro-object %d\n",size );
 
-		/*Application de la matrice directe*/
-		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
-		/*g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);*/
 
 		/*Dessin*/
 		DrawLeaf(str, ptr_Mat);
@@ -305,9 +304,6 @@ void DrawNodes(Node * str, double * ptr_Mat){
 			level--;
 		}
 
-		/*Application de la matrice inverse*/
-		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
-		/*g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);*/
 	}
 	/*Si c'est un noeud*/
 	else if(str->type==2)
@@ -316,9 +312,6 @@ void DrawNodes(Node * str, double * ptr_Mat){
 		printf("Go to son \n");
 		Node *son;
 
-		/*Application de la matrice directe*/
-		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
-		/*g3x_ProdHMat( str->Md.c,ptr_Mat, ptr_Mat);*/
 
 		for(i=0;i<(str->sonsNo);i++)
 		{
@@ -330,10 +323,13 @@ void DrawNodes(Node * str, double * ptr_Mat){
 			level--;
 		}
 
-		/*Application de la matrice inverse*/
-		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
-		/*g3x_ProdHMat(str->Mi.c,ptr_Mat,ptr_Mat);*/
 	}
+
+
+	/*Application de la matrice inverse*/
+	g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
+	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
+
 
 }
 
@@ -369,67 +365,61 @@ temp=N0xN1;
 void UpdateNode(Node * str, double * ptr_Mat){
 	int size,i;
 	size=str->sonsNo;
-	
-	if(str->type==0){
-		printf("I'm an object %d\n",size );
-		/*Application de la matrice directe*/
-		g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
-		/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
-		UpdateLeaf(str,ptr_Mat);
-		/*Application de la matrice inverse*/
-		g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
-		/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
-	}
 
-else if(str->type==1){/*Si c'est un macro-object*/
-	printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
-	printf("Drawing macro-object %d\n",size );
 	/*Application de la matrice directe*/
 	g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
 	/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
 
-	/*Dessin*/
-	printf("shapes \n");
-	for(i=0;i<str->shapesNo;i++){
-		UpdateShape2(&(str->shapes)[i],ptr_Mat);
+
+	
+	if(str->type==0){
+		printf("I'm an object %d\n",size );
+		UpdateLeaf(str,ptr_Mat);
 	}
+
+	else if(str->type==1){
+		/*Si c'est un macro-object*/
+		printf("I'm a SubNode my size is %d my type is %d\n",size, str->type );
+		printf("Drawing macro-object %d\n",size );
+
+	/*Dessin*/
+		printf("shapes \n");
+		for(i=0;i<str->shapesNo;i++){
+			UpdateShape2(&(str->shapes)[i],ptr_Mat);
+		}
 	/*Dessine ses fils*/
-	printf("Go to son \n");
-	Node *son;
-	for(i=0;i<(str->sonsNo);i++){
-		printf("test\n");
-		son=&((str->nodes)[i]);
-		printf("looking son %d type %d\n", i, son->type );
-		UpdateNode(son, ptr_Mat);
+		printf("Go to son \n");
+		Node *son;
+		for(i=0;i<(str->sonsNo);i++){
+			printf("test\n");
+			son=&((str->nodes)[i]);
+			printf("looking son %d type %d\n", i, son->type );
+			UpdateNode(son, ptr_Mat);
+
+		}
+
+
+	}
+	else if(str->type==2){
+/*Si c'est un noeud*/
+		printf("I'm a Node my size is %d my type is %d\n",size, str->type );
+		printf("Go to son \n");
+		Node *son;
+
+		for(i=0;i<(str->sonsNo);i++)
+		{
+			printf("test\n");
+			son=&((str->nodes)[i]);
+			printf("looking son %d type %d\n", i, son->type );
+			UpdateNode(son, ptr_Mat);
+		}
+
 
 	}
 
 	/*Application de la matrice inverse*/
 	g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
-
-}
-else if(str->type==2){/*Si c'est un noeud*/
-printf("I'm a Node my size is %d my type is %d\n",size, str->type );
-printf("Go to son \n");
-Node *son;
-/*Application de la matrice directe*/
-/*g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);*/
-g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);
-
-for(i=0;i<(str->sonsNo);i++)
-{
-	printf("test\n");
-	son=&((str->nodes)[i]);
-	printf("looking son %d type %d\n", i, son->type );
-	UpdateNode(son, ptr_Mat);
-}
-
-/*Application de la matrice inverse*/
-g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
-/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
-
-}
 
 }
 

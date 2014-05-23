@@ -42,7 +42,7 @@ Shape * InitializeTore(Shape *str){
 
 
 
-void DrawTore(Shape * str, double *ptr_Mat){
+void DrawTore(Shape * str){
 
 	int i,j,k;
 	i=0;

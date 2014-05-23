@@ -35,7 +35,7 @@ Shape * InitializeCylindre(Shape * str){
 	return str;
 }
 
-void DrawCylindre(Shape * str, double *ptr_Mat){
+void DrawCylindre(Shape * str){
 
 
 	int i,j,k,N2,P2;
