@@ -242,7 +242,7 @@ void DrawShape(Shape * str){
 
 
 
-void DrawLeaf(Node * str, double * ptr_Mat){ 
+void DrawLeaf(Node * str){ 
 	int i,size;
 	size=(str->shapesNo);
 	for(i=0;i<size;i++){
@@ -254,33 +254,18 @@ void DrawLeaf(Node * str, double * ptr_Mat){
 
 
 
-void DrawsubNode(Node * str){
-
-}
-
 int level=0;
 
-void DrawNodes(Node * str, double * ptr_Mat){
+void DrawNodes(Node * str){
 	int size,i;
 
 	size=str->sonsNo;
-	/*Application de la matrice directe*/
-	g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
-		/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
 
-/*Affichage de la matrice courante*/
-	printf("********level = %d********\n",level );
-	int k;
-
-	for (k = 0; k < 16; ++k)
-	{
-		printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
-	}
 	/*Si c'est un Objet*/
 	if(str->type==0)
 	{
 		printf("level : %d I'm an object i have %d sons and %d shapes\n",level, size,str->shapesNo );
-		DrawLeaf(str, ptr_Mat);
+		DrawLeaf(str);
 	}
 
 	/*Si c'est un Macro-Objet*/
@@ -291,7 +276,7 @@ void DrawNodes(Node * str, double * ptr_Mat){
 
 
 		/*Dessin*/
-		DrawLeaf(str, ptr_Mat);
+		DrawLeaf(str);
 		/*Dessine ses fils*/
 		printf("Go to son \n");
 		Node *son;
@@ -300,7 +285,7 @@ void DrawNodes(Node * str, double * ptr_Mat){
 			son=&((str->nodes)[i]);
 			printf("looking son %d type %d\n", i, son->type );
 			level++;
-			DrawNodes(son,ptr_Mat);
+			DrawNodes(son);
 			level--;
 		}
 
@@ -319,7 +304,7 @@ void DrawNodes(Node * str, double * ptr_Mat){
 			son=&((str->nodes)[i]);
 			printf("looking son %d type %d\n", i, son->type );
 			level++;
-			DrawNodes(son, ptr_Mat);
+			DrawNodes(son);
 			level--;
 		}
 
@@ -327,7 +312,7 @@ void DrawNodes(Node * str, double * ptr_Mat){
 
 
 	/*Application de la matrice inverse*/
-	g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
+	/*g3x_ProdHMat(ptr_Mat,str->Mi.c,ptr_Mat);
 	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
 
 
@@ -370,6 +355,14 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	g3x_ProdHMat(ptr_Mat, str->Md.c, ptr_Mat);
 	/*g3x_ProdHMat(str->Md.c, ptr_Mat,  ptr_Mat);*/
 
+/*Affichage de la matrice courante*/
+	printf("********level = %d********\n",level );
+	int k;
+
+	for (k = 0; k < 16; ++k)
+	{
+		printf("Matrice directe k = %d -> %f\n", k, ptr_Mat[k]);
+	}
 
 	
 	if(str->type==0){
@@ -803,7 +796,7 @@ void Init(void){
 	MakeTransformation(ptr_n3,NULL,NULL,homo_n3);
 
 	MakeTransformation(ptr_n4,tr_n4,NULL,NULL);
-/*	MakeTransformation(ptr_n4,NULL,rot_n4,NULL);*/
+	MakeTransformation(ptr_n4,NULL,rot_n4,NULL);
 	MakeTransformation(ptr_n4,NULL,NULL,homo_n4);
 	
 	
@@ -1034,12 +1027,12 @@ static void Dessin(void)
 
 	/*glPushMatrix(); */
 	/*glScalef(0.5,0.5,0.5);*/
-	HMat anim;
+	/*HMat anim;
 	initMatrix(&anim);
 	/*g3x_MakeIdentity(anim.c);*/ 
 
 	printf("Entering DrawNodes\n");
-	DrawNodes(ptr_sc, anim.c);
+	DrawNodes(ptr_sc);
 	printf("Exiting DrawNodes\n");
 
 	/*glTranslatef(0.,0.,-10);
