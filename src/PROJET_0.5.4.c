@@ -12,7 +12,7 @@
 #include "pave.c"
 #include "cylindre.c"
  #include "para.c"
-      
+
 
   
 
@@ -208,108 +208,108 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 		/*if(str->ID==5){
 			printf("%lf %lf  %lf\n", (*vC)[0],(*vC)[1],(*vC)[2]);
 		}*/
-	}
-  
-	for (q = 0; q < str->normNo; ++q){
-		g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
+		}
+
+		for (q = 0; q < str->normNo; ++q){
+			g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
 		/*Transformation des normales*/
-		(*vn)[0]=ResultPoint2[0];            
-		(*vn)[1]=ResultPoint2[1];
-		(*vn)[2]=ResultPoint2[2];
-		vCn++;  
-		vn++;    
+			(*vn)[0]=ResultPoint2[0];            
+			(*vn)[1]=ResultPoint2[1];
+			(*vn)[2]=ResultPoint2[2];
+			vCn++;  
+			vn++;    
 
-	}
+		}
 
-	return true; 
+		return true; 
 
-}  
+	}  
 
-void DrawShape(Shape * str){
+	void DrawShape(Shape * str){
 
-	g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
+		g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
 
 	/*printf("drawing shape %d\n", str->ID);*/
-	switch (str->ID){
-		case 0: 
-		g3x_Material(vert,ambi,diff,spec,shin,1.);
-		DrawPave(str);
-		break;
-		case 1:  
-		g3x_Material(rouge,ambi,diff,spec,shin,1.);
-		DrawSphere(str);
-		break;
-		case 2:     
-		g3x_Material(rouge,ambi,diff,spec,shin,1.); 
-		DrawCylindre(str);
-		break;
-		case 3:
-		g3x_Material(jaune,ambi,diff,spec,shin,1.);
-		DrawTore(str);
-		break;
-		case 4:
-		g3x_Material(cyan,ambi,diff,spec,shin,1.);
-		DrawRessort(str);   
-		break;
-		case 5:
-		g3x_Material(cyan,ambi,diff,spec,shin,1.);
-		DrawPara(str);   
-		break;
-	}        
-}
-    
-
-      
-
-void DrawLeaf(Node * str){ 
-	int i,size;
-	size=(str->shapesNo);
-	for(i=0;i<size;i++){
-		/*UpdateShape(&(str->shapes)[i],ptr_currMat);*/
-		DrawShape(&(str->shapes)[i]);
+		switch (str->ID){
+			case 0: 
+			g3x_Material(vert,ambi,diff,spec,shin,1.);
+			DrawPave(str);
+			break;
+			case 1:  
+			g3x_Material(rouge,ambi,diff,spec,shin,1.);
+			DrawSphere(str);
+			break;
+			case 2:     
+			g3x_Material(rouge,ambi,diff,spec,shin,1.); 
+			DrawCylindre(str);
+			break;
+			case 3:
+			g3x_Material(jaune,ambi,diff,spec,shin,1.);
+			DrawTore(str);
+			break;
+			case 4:
+			g3x_Material(cyan,ambi,diff,spec,shin,1.);
+			DrawRessort(str);   
+			break;
+			case 5:
+			g3x_Material(cyan,ambi,diff,spec,shin,1.);
+			DrawPara(str);   
+			break;
+		}        
 	}
 
-}
 
 
 
-int level=0;
+	void DrawLeaf(Node * str){ 
+		int i,size;
+		size=(str->shapesNo);
+		for(i=0;i<size;i++){
+		/*UpdateShape(&(str->shapes)[i],ptr_currMat);*/
+			DrawShape(&(str->shapes)[i]);
+		}
 
-void DrawNodes(Node * str){
-	int size,i;
+	}
 
-	size=str->sonsNo;
+
+
+	int level=0;
+
+	void DrawNodes(Node * str){
+		int size,i;
+
+		size=str->sonsNo;
 
 	/*Si c'est un Objet*/
-	if(str->type==0)
-	{
-		DrawLeaf(str);
-	}
+		if(str->type==0)
+		{
+			DrawLeaf(str);
+		}
 
 	/*Si c'est un Macro-Objet*/
-	else if(str->type==1)
-	{
-		/*Dessin*/
-		DrawLeaf(str);
-		/*Dessine ses fils*/
-		Node *son;
-		for(i=0;i<(str->sonsNo);i++){
-			son=&((str->nodes)[i]);
-			DrawNodes(son);
-		}
-
-	}
-	/*Si c'est un noeud*/
-	else if(str->type==2)
-	{
-		Node *son;
-		for(i=0;i<(str->sonsNo);i++)
+		else if(str->type==1)
 		{
-			son=&((str->nodes)[i]);
-			DrawNodes(son);
-		}
+		/*Dessin*/
+			DrawLeaf(str);
+		/*Dessine ses fils*/
+			Node *son;
+			for(i=0;i<(str->sonsNo);i++){
+				son=&((str->nodes)[i]);
+				DrawNodes(son);
+			}
 
-	}
+		}
+	/*Si c'est un noeud*/
+		else if(str->type==2)
+		{
+			Node *son;
+			for(i=0;i<(str->sonsNo);i++)
+			{
+				son=&((str->nodes)[i]);
+				DrawNodes(son);
+			}
+
+		}
 
 
 	/*Application de la matrice inverse*/
@@ -317,20 +317,20 @@ void DrawNodes(Node * str){
 	/*g3x_ProdHMat(str->Mi.c, ptr_Mat,ptr_Mat);*/
 
 
-}
-
-
-
-void UpdateLeaf(Node * str, double * ptr_Mat){
-
-	int i,size;
-	size=(str->shapesNo);
-/*Dessin*/ 
-	for(i=0;i<size;i++){ 
-		UpdateShape(&(str->shapes)[i],ptr_Mat);
 	}
 
-}
+
+
+	void UpdateLeaf(Node * str, double * ptr_Mat){
+
+		int i,size;
+		size=(str->shapesNo);
+/*Dessin*/ 
+		for(i=0;i<size;i++){ 
+			UpdateShape(&(str->shapes)[i],ptr_Mat);
+		}
+
+	}
 
 
 
@@ -574,13 +574,34 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 
 
-
+/*Formes*/
 
 	Shape chassis;
 	static Shape *ptr_chassis=&chassis;
 
+	Shape chassis2;
+	static Shape *ptr_chassis2=&chassis2;
+
+	Shape boule;
+	static Shape *ptr_boule=&boule;
+
+	Shape porteDrapeau;
+	static Shape *ptr_porteDrapeau=&porteDrapeau;
+
+	Shape drapeau;
+	static Shape *ptr_drapeau=&drapeau;
+
 	Shape tourelle;
 	static Shape *ptr_tourelle=&tourelle;
+
+	Shape tourelle2;
+	static Shape *ptr_tourelle2=&tourelle2;
+
+	Shape tourelle3;
+	static Shape *ptr_tourelle3=&tourelle3;
+
+	Shape tourelle4;
+	static Shape *ptr_tourelle4=&tourelle4;
 
 	Shape canon;
 	static Shape *ptr_canon=&canon;
@@ -599,8 +620,34 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	struct Node *ptr_n1= &n1;
 	struct Node n2;
 	struct Node *ptr_n2= &n2;
+	/*Tourelle*/
 	struct Node n3;
 	struct Node *ptr_n3= &n3;
+
+	struct Node ntourelle2;
+	struct Node *ptr_ntourelle2= &ntourelle2;
+
+	struct Node ntourelle3;
+	struct Node *ptr_ntourelle3= &ntourelle3;
+
+	struct Node ntourelle4;
+	struct Node *ptr_ntourelle4= &ntourelle4;
+
+	struct Node ntourelleC;
+	struct Node *ptr_ntourelleC= &ntourelleC;
+
+	struct Node ndrapeau;
+	struct Node *ptr_ndrapeau= &ndrapeau;
+
+	struct Node nporteDrapeau;
+	struct Node *ptr_nporteDrapeau= &nporteDrapeau;
+
+	struct Node nensembleDrapeau;
+	struct Node *ptr_nensembleDrapeau= &nensembleDrapeau;
+
+	struct Node nboule;
+	struct Node *ptr_nboule= &nboule;
+
 	struct Node n4;
 	struct Node *ptr_n4= &n4;
 	struct Node n5;
@@ -611,6 +658,8 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	struct Node *ptr_n7= &n7;
 	struct Node n8;
 	struct Node *ptr_n8= &n8;
+	struct Node nchassis2;
+	struct Node *ptr_nchassis2= &nchassis2;
 
 
 
@@ -631,11 +680,19 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	glGetDoublev( GL_MODELVIEW, ptr_currMat);
 */
 	/*pave*/
+	drapeau.ID=0;
+	chassis2.ID=0;
+	/*trapeze 3D*/
 	chassis.ID=5;
+	tourelle.ID=5;
+	tourelle2.ID=5;
+	tourelle3.ID=5;
+	tourelle4.ID=5;
 	/*sphere*/
-	/*s1.ID=1;*/
+	boule.ID=1;
 	/*cylindre*/
-	tourelle.ID=2;
+	porteDrapeau.ID=2;
+	/*cylindre*/
 	canon.ID=2;
 	/*tore*/
 	roueGauche.ID=3;
@@ -645,13 +702,29 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 
 	InitializePara(ptr_chassis);
-	InitializeCylindre(ptr_tourelle);
+	InitializePara(ptr_tourelle);
+	InitializePara(ptr_tourelle2);
+	InitializePara(ptr_tourelle3);
+	InitializePara(ptr_tourelle4);
+
 	InitializeCylindre(ptr_canon);
+	InitializeCylindre(ptr_porteDrapeau);
+
 	InitializeTore(ptr_roueGauche,0.1);
 	InitializeTore(ptr_roueDroite,0.1);
+	InitializePave(ptr_chassis2);
+	InitializeSphere(ptr_boule);
+	InitializePave(ptr_drapeau);
 
 
-/*initScene(ptr_sc);*/
+
+/*chassis base*/
+	ptr_nchassis2->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_nchassis2->shapesNo=1;
+	ptr_nchassis2->sonsNo=0;
+	ptr_nchassis2->type=0;
+	ptr_nchassis2->shapes[0]=chassis2;
+	initNodeMatrix(ptr_nchassis2);
 
 
 
@@ -663,6 +736,32 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	ptr_n3->type=0;
 	ptr_n3->shapes[0]=tourelle;
 	initNodeMatrix(ptr_n3);
+
+	/*tourelle2*/
+	ptr_ntourelle2->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_ntourelle2->shapesNo=1;
+	ptr_ntourelle2->sonsNo=0;
+	ptr_ntourelle2->type=0;
+	ptr_ntourelle2->shapes[0]=tourelle2;
+	initNodeMatrix(ptr_ntourelle2);
+
+	/*tourelle3*/
+	ptr_ntourelle3->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_ntourelle3->shapesNo=1;
+	ptr_ntourelle3->sonsNo=0;
+	ptr_ntourelle3->type=0;
+	ptr_ntourelle3->shapes[0]=tourelle3;
+	initNodeMatrix(ptr_ntourelle3);
+
+	/*tourelle4*/
+	ptr_ntourelle4->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_ntourelle4->shapesNo=1;
+	ptr_ntourelle4->sonsNo=0;
+	ptr_ntourelle4->type=0;
+	ptr_ntourelle4->shapes[0]=tourelle4;
+	initNodeMatrix(ptr_ntourelle4);
+
+
 
 /*Canon*/
 	ptr_n4->shapes=(Shape *)malloc(1*sizeof(Shape));
@@ -696,7 +795,44 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	ptr_n6->shapes[0]=roueDroite;
 	initNodeMatrix(ptr_n6);
 
+	/*drapeau*/
+	ptr_ndrapeau->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_ndrapeau->shapesNo=1;
+	ptr_ndrapeau->sonsNo=0;
+	ptr_ndrapeau->type=0;
+	ptr_ndrapeau->shapes[0]=drapeau;
+	initNodeMatrix(ptr_ndrapeau);
 
+	/*boule*/
+	ptr_nboule->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_nboule->shapesNo=1;
+	ptr_nboule->sonsNo=0;
+	ptr_nboule->type=0;
+	ptr_nboule->shapes[0]=boule;
+	initNodeMatrix(ptr_nboule);
+
+	/*porteDrapeau*/
+	ptr_nporteDrapeau->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_nporteDrapeau->shapesNo=1;
+	ptr_nporteDrapeau->sonsNo=0;
+	ptr_nporteDrapeau->type=0;
+	ptr_nporteDrapeau->shapes[0]=porteDrapeau;
+	initNodeMatrix(ptr_nporteDrapeau);
+
+
+
+
+/***************************************/
+	/*porte drapeau + drapeau + boule*/
+
+	ptr_nensembleDrapeau->nodes=(Node *)malloc(3*sizeof(Node));
+	ptr_nensembleDrapeau->sonsNo=3;                         
+	ptr_nensembleDrapeau->shapesNo=0;
+	ptr_nensembleDrapeau->type=2;
+	ptr_nensembleDrapeau->nodes[0]=nporteDrapeau;
+	ptr_nensembleDrapeau->nodes[1]=ndrapeau;
+	ptr_nensembleDrapeau->nodes[2]=nboule;
+	initNodeMatrix(ptr_nensembleDrapeau);
 
 /***************/
 
@@ -710,7 +846,21 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	initNodeMatrix(ptr_n8);
 
 
+	
 
+
+/***************************************/
+/* tourelle complete */
+
+	ptr_ntourelleC->nodes=(Node *)malloc(4*sizeof(Node));
+	ptr_ntourelleC->sonsNo=4;
+	ptr_ntourelleC->shapesNo=0;
+	ptr_ntourelleC->type=2;
+	ptr_ntourelleC->nodes[0]=n3;
+	ptr_ntourelleC->nodes[1]=ntourelle2;
+	ptr_ntourelleC->nodes[2]=ntourelle3;
+	ptr_ntourelleC->nodes[3]=ntourelle4;
+	initNodeMatrix(ptr_ntourelleC);
 
 /***************************************/
 
@@ -719,8 +869,8 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	ptr_n1->sonsNo=2;
 	ptr_n1->shapesNo=0;
 	ptr_n1->type=2;
-	ptr_n1->nodes[0]=n3;
-	ptr_n1->nodes[1]=n4;
+	ptr_n1->nodes[0]=n4;
+	ptr_n1->nodes[1]=ntourelleC;
 	initNodeMatrix(ptr_n1);
 
 /*  roue gauche + roue droite*/ 
@@ -734,11 +884,13 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 
 /* Chassis + autres */
-	ptr_n7->nodes=(Node *)malloc(1*sizeof(Node));
-	ptr_n7->sonsNo=1;
+	ptr_n7->nodes=(Node *)malloc(3*sizeof(Node));
+	ptr_n7->sonsNo=3;
 	ptr_n7->shapesNo=0; 
 	ptr_n7->type=2;
 	ptr_n7->nodes[0]=n8;
+	ptr_n7->nodes[1]=nchassis2;
+	ptr_n7->nodes[2]=nensembleDrapeau;
 	initNodeMatrix(ptr_n7);
 
 
@@ -798,40 +950,79 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 	HMat anim;  
 
-/*Ceanon n4 + tourelle n3*/
+/*Ceanon n4 + tourelle n3 + tuorelle2  3 4*/
 
-	double trans_n1[3]={0,0,0.5};
+	double trans_n1[3]={0,0,0.15}; 
+	double homo_n1[3]= {1,1,1};
+	/*double trans_n1[3]={0,-0.25,0.7};
+	double homo_n1[3]= {0.5,1,0.2};
+*/
+	/*double tr_n3[3]={0,0,-0.1}; 
+	double homo_n3[3]={0.8,0.8,0.6};
+*/
 
-	double homo_n3[3]={1.,1.,0.6};
+	double tr_ntourelleC[3]={0,-0.25,0};
+	double hom_ntourelleC[3]= {0.5,1,0.2};
+
+	double tr_n3[3]={0,0.5,0.5}; 
+	double homo_n3[3]= {1,1,1};
 
 	double tr_n4[3]={0,0.5,0.5}; 
 	double rot_n4[3]= {1.57,0.,0.};
 	double homo_n4[3]={0.15,2,0.15};
 
+	double tr_ntourelle2[3]={0,0.5,0.5}; 
+	double rot_ntourelle2[3]= {0,-PI,0};
+	
+	double tr_ntourelle3[3]={0,-0.5,0.5}; 
+	double rot_ntourelle3[3]= {0,0,PI};
+	
+	double tr_ntourelle4[3]={0,-0.5,0.5}; 
+	double rot_ntourelle4[3]= {PI,0,0};
+	
 	
 
 
-  
-	MakeTransformation(ptr_n1,trans_n1,NULL,NULL);
 
+	MakeTransformation(ptr_n1,trans_n1,NULL,NULL);
+	MakeTransformation(ptr_n1,trans_n1,NULL,homo_n1);
+
+	MakeTransformation(ptr_ntourelleC,tr_ntourelleC,NULL,NULL);
+	MakeTransformation(ptr_ntourelleC,tr_ntourelleC,NULL,hom_ntourelleC);
+
+	MakeTransformation(ptr_n3,tr_n3,NULL,NULL);
 	MakeTransformation(ptr_n3,NULL,NULL,homo_n3);
 
+
+
+	MakeTransformation(ptr_ntourelle2,tr_ntourelle2,NULL,NULL);
+	MakeTransformation(ptr_ntourelle2,NULL,rot_ntourelle2,NULL);
+
+	MakeTransformation(ptr_ntourelle3,tr_ntourelle3,NULL,NULL);
+	MakeTransformation(ptr_ntourelle3,NULL,rot_ntourelle3,NULL);
+
+	MakeTransformation(ptr_ntourelle4,tr_ntourelle4,NULL,NULL);
+	MakeTransformation(ptr_ntourelle4,NULL,rot_ntourelle4,NULL);
+
+/*cannon*/
 	MakeTransformation(ptr_n4,tr_n4,NULL,NULL);
 	MakeTransformation(ptr_n4,NULL,rot_n4,NULL);
 	MakeTransformation(ptr_n4,NULL,NULL,homo_n4);
 	
+
+
 	
 
 /*Transformation roue gauche n5+ roue droite n6 */
 
 
-	
-	double trans_n2[3]={0,0,-0.2};
+
+	double trans_n2[3]={0,0,-0.45};
 	double rot_n2[3]= {PI/2,0,0};
 	double hom_n2[3]={2,0.5,0.3};
 	double trans_n5[3]={0,0,-2};
 	double trans_n6[3]={0,0,2}; 
-   
+
 
 	/*MakeTransformation(ptr_n6,trans_n6,NULL,NULL);*/
 
@@ -840,7 +1031,7 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	MakeTransformation(ptr_n2,trans_n2,NULL,NULL);
 
 
-	
+
 	MakeTransformation(ptr_n5,trans_n5,NULL,NULL);
 	MakeTransformation(ptr_n6,trans_n6,NULL,NULL);
 
@@ -850,14 +1041,37 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 /*Chassis */
 
-	double n8_homo[3]={2,1.2,0.8};
-
- 	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
+	double n8_homo[3]={2,1.4,0.4};
+	double tr_n8[3]={-1,0,-0.1}; 
+	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
+	MakeTransformation(ptr_n8,tr_n8,NULL,NULL);
 	
-		/*HMat anim;*/
-	/*initMatrix(&anim); 
-	UpdateNode(ptr_sc,anim.c);
-*/
+	double hom_chassis2[3]={2,1.4,0.2};
+	double tr_chassis2[3]={0,0,-0.45}; 
+	MakeTransformation(ptr_nchassis2,NULL,NULL,hom_chassis2);
+	MakeTransformation(ptr_nchassis2,tr_chassis2,NULL,NULL);
+
+	double tr_nensembleDrapeau[3]={-0.8,0.25,0.2}; 
+	MakeTransformation(ptr_nensembleDrapeau,tr_nensembleDrapeau,NULL,NULL);
+
+	double hom_porteDrapeau[3]={0.01,0.01,0.2};
+	double tr_porteDrapeau[3]={0,0,0}; 
+	MakeTransformation(ptr_nporteDrapeau,NULL,NULL,hom_porteDrapeau);
+	MakeTransformation(ptr_nporteDrapeau,tr_porteDrapeau,NULL,NULL);
+
+
+	double hom_boule[3]={0.015,0.015,0.015};
+	double tr_boule[3]={0,0,0.08}; 
+	MakeTransformation(ptr_nboule,NULL,NULL,hom_boule);
+	MakeTransformation(ptr_nboule,tr_boule,NULL,NULL);
+
+
+	double hom_drapeau[3]={0.1,0.002,0.05};
+	double tr_drapeau[3]={-0.05,0,0.06}; 
+	MakeTransformation(ptr_ndrapeau,NULL,NULL,hom_drapeau);
+	MakeTransformation(ptr_ndrapeau,tr_drapeau,NULL,NULL);
+
+
 
 
 

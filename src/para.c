@@ -4,11 +4,11 @@ double f(double input){
 
 	double output=0;
 	/*printf("%lf\n",input );*/
-	if(input<1/2.0){
+	if(input<0.8){
 		output=0.5;		
 	}
 	else{
-		output=1-input;
+		output=2.5-2.5*input;
 
 	}
 
@@ -35,24 +35,24 @@ Shape * InitializePara(Shape * str){
 	for(i=0;i<N;i++)
 	{
 
-		(*v2)[0]=i*a;
-		(*v2)[1]=-1;
+		(*v2)[0]=i*a-0,5;
+		(*v2)[1]=-0.5;
 		(*v2)[2]=-0.5;
 		v2++;
-
-		(*v2)[0]=i*a;
-		(*v2)[1]=1;
-		(*v2)[2]=-0.5;
-		v2++;
-
 
 		(*v2)[0]=i*a;
 		(*v2)[1]=0.5;
+		(*v2)[2]=-0.5;
+		v2++;
+
+
+		(*v2)[0]=i*a-0,5;
+		(*v2)[1]=0.25;
 		(*v2)[2]=f(i*a);
 		v2++;
 
 		(*v2)[0]=i*a;
-		(*v2)[1]=-0.5;
+		(*v2)[1]=-0.25;
 		(*v2)[2]=f(i*a);
 		v2++;
 
@@ -103,7 +103,14 @@ void DrawPara(Shape * str){
 	glBegin(GL_QUADS);
 
 
-	g3x_Material(bleu,ambi,diff,spec,shin,1.);
+	g3x_Material(rouge,ambi,diff,spec,shin,1.);
+
+
+	i=4;
+	glVertex3dv(str->vrtx[i]);
+	glVertex3dv(str->vrtx[i+1]);
+	glVertex3dv(str->vrtx[i+2]);
+	glVertex3dv(str->vrtx[i+3]);
 
 	for(i=0;i<str->pointNo-7;i++){
 
@@ -117,6 +124,12 @@ void DrawPara(Shape * str){
 		glNormal3dv(str->norm[i]);
 
 	}
+
+	glVertex3dv(str->vrtx[i]);
+	glVertex3dv(str->vrtx[i+1]);
+	glVertex3dv(str->vrtx[i+2]);
+	glVertex3dv(str->vrtx[i+3]);
+
 
 	/*g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
 

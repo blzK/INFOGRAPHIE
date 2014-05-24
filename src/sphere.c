@@ -13,14 +13,15 @@ Shape * InitializeSphere(Shape * str){
 	memset(str->norm, 0,N*P*sizeof(G3Xvector));*/
 	G3Xvector *vn=str->norm;
 	G3Xpoint *vt=str->vrtx;
+
 	for(i=0;i<N;i++)
 	{
 
 		for (j=0;j<P;j++)
 		{
-			(*vt)[0]=r*cos(i*a)*sin(j*b);
-			(*vt)[1]=r*sin(i*a)*sin(j*b);
-			(*vt)[2]=r*cos(j*b);
+			(*vt)[0]=cos(i*a)*sin(j*b);
+			(*vt)[1]=sin(i*a)*sin(j*b);
+			(*vt)[2]=cos(j*b);
 
 /*normale sphere*/
 			/*
@@ -29,9 +30,9 @@ Shape * InitializeSphere(Shape * str){
 			(*vn)[2]=r*cos(j*b);
 */
 
-			(*vn)[0]=r*cos(i*a)*sin(j*b);
-			(*vn)[1]=r*sin(i*a)*sin(j*b);
-			(*vn)[2]=r*cos(j*b);
+			(*vn)[0]=cos(i*a)*sin(j*b);
+			(*vn)[1]=sin(i*a)*sin(j*b);
+			(*vn)[2]=cos(j*b);
 
 			vn++;
 			vt++;
@@ -96,7 +97,7 @@ glEnd();*/
 			glVertex3dv(str->vrtx[k]);
 
 		}
-		k = i*P+j;
+		/*k = i*P+j;
 		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
 
@@ -110,36 +111,89 @@ glEnd();*/
 
 		k = (i+stepn)*P + j; 
 		glNormal3dv(str->norm[k]);
-		glVertex3dv(str->vrtx[k]);
+		glVertex3dv(str->vrtx[k]);*/
 
 
 	}
 
-
+/*
+glBegin(GL_POLYGON);
 
 	for(j=0;j<P;j+=stepp){
 
 
 		i=N-stepn;
 		k = i+j;
-			/*glNormal3dv(str->norm[k]);*/
+		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
 
 		k = i + (j+stepp);
-			/*glNormal3dv(str->norm[k]);*/
+		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
-		i=stepn;
+
+		i=0;
 		k = (i+stepn)+(j+stepp);
-			/*glNormal3dv(str->norm[k]);*/
+		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
 
 		k = (i+stepn) + j; 
-			/*glNormal3dv(str->norm[k]);*/
+		glNormal3dv(str->norm[k]);
 		glVertex3dv(str->vrtx[k]);
 
 	}
+*/
+
+	/*glEnd();
+	glBegin(GL_POLYGON);
+*/
+/*On raccommode */
+
+	for(j=0;j<P-stepp;j+=stepp){
+	/*	glVertex3dv(str->vrtx[N*P+j]);
+		glVertex3dv(str->vrtx[N*P+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j+stepp]);
+		glVertex3dv(str->vrtx[(stepn)*N+j]);
+*/
+		i=0;
+		k = i*P+j;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
+		
+
+		k = i*P+j+stepp;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
+		
+
+		i=N-stepn;
 
 
+		k = i*P+j+stepp;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
+
+		k = i*P+j;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
+		
+		
+
+
+	}
+	glEnd();
+
+	/*On bouche le trou */
+
+	glBegin(GL_POLYGON);
+	j=P-stepp;
+	for(i=0;i<N-stepn;i+=stepn){
+		k = i*P+j;
+		glNormal3dv(str->norm[k]);
+		glVertex3dv(str->vrtx[k]);
+	}
+
+	glDisable(GL_LIGHTING);
+	
 	
 	glEnd();
 }
