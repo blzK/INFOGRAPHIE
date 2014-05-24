@@ -1046,8 +1046,8 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
 	MakeTransformation(ptr_n8,tr_n8,NULL,NULL);
 	
-	double hom_chassis2[3]={2,1.4,0.2};
-	double tr_chassis2[3]={0,0,-0.45}; 
+	double hom_chassis2[3]={2,1.4,0.25};
+	double tr_chassis2[3]={0,0,-0.43}; 
 	MakeTransformation(ptr_nchassis2,NULL,NULL,hom_chassis2);
 	MakeTransformation(ptr_nchassis2,tr_chassis2,NULL,NULL);
 
