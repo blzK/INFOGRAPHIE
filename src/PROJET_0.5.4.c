@@ -12,6 +12,10 @@
 #include "pave.c"
 #include "cylindre.c"
  #include "para.c"
+ #include "qdbmp.c"
+  #include "bmpfile.h" 
+  
+
 
 
   
@@ -226,33 +230,36 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 	}  
 
 	void DrawShape(Shape * str){
-
-		g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
+		printf("%f\n", str->col[0]);
+		
+		if(str->col[0]==0.00){
+			g3x_Material(vertKaki,ambi,diff,spec,shin,alpha);
+			/*glColor4fv(rouge);  */
+			printf("in loop\n");
+		}else{
+			g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
+		}
+		/*  ;*/
+		/*
 
 	/*printf("drawing shape %d\n", str->ID);*/
 		switch (str->ID){
 			case 0: 
-			g3x_Material(vert,ambi,diff,spec,shin,1.);
 			DrawPave(str);
 			break;
 			case 1:  
-			g3x_Material(rouge,ambi,diff,spec,shin,1.);
 			DrawSphere(str);
 			break;
 			case 2:     
-			g3x_Material(rouge,ambi,diff,spec,shin,1.); 
 			DrawCylindre(str);
 			break;
 			case 3:
-			g3x_Material(jaune,ambi,diff,spec,shin,1.);
 			DrawTore(str);
 			break;
 			case 4:
-			g3x_Material(cyan,ambi,diff,spec,shin,1.);
 			DrawRessort(str);   
 			break;
-			case 5:
-			g3x_Material(cyan,ambi,diff,spec,shin,1.);
+			case 5: 
 			DrawPara(str);   
 			break;
 		}        
@@ -665,12 +672,58 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 
 	void Init(void){
+/*
+ BMP* bmp; 
+ UCHAR rc, gc, bc;
+  UINT width, height;
+   UINT x, y;
 
+/*MAP**/
+/*
+		 /* Read an image file */
+	/*	bmp = BMP_ReadFile("map.bmp"); 
+		BMP_CHECK_ERROR( stderr, -1 ); 
+		  /* If an error has occurred, notify and exit */
+		   /* Get image's dimensions */ 
+	/*	width = BMP_GetWidth( bmp ); 
+		height = BMP_GetHeight( bmp );
+		    /* Iterate through all the image's pixels */ 
+	/*	for ( x = 0 ; x < width ; ++x ) {
+			for ( y = 0 ; y < height ; ++y ) 
+			{ 
+		     /* Get pixel's RGB values */
+	/*			BMP_GetPixelRGB( bmp, x, y, &rc, &gc, &bc ); 
+		      /* Invert RGB values */
+	/*			 BMP_SetPixelRGB( bmp, x, y, 255 - rc, 255 - gc, 255 - bc );
+	/*		}
+		} 
+
+*/
+
+		/*test2*/
+/*s
+
+uint32_t bmp_get_width(bmpfile_t *bmp);
+uint32_t bmp_get_height(bmpfile_t *bmp);
+uint32_t bmp_get_depth(bmpfile_t *bmp);/
+
+		bmp = bmp_create(, ,);
+
+
+  for (i = 10, j = 10; j < ); ++i, ++j) {
+    bmp_set_pixel(bmp, i, j, pixel);
+    pixel.red++;
+    pixel.green++;
+    pixel.blue++;
+    bmp_set_pixel(bmp, i + 1, j, pixel);
+    bmp_set_pixel(bmp, i, j + 1, pixel);
+  }
+*/
 		InitCanonical();
 
 		ptr_currMat =currMat.c;
 		ptr_currMat=malloc(16*sizeof(double)); 
-	/*R0[0]=0;
+	/*R0[0]=0;e
 	R0[1]=0;  
 	R0[2]=0;
 	ptr_currRep= &R0;*/
@@ -681,6 +734,12 @@ void UpdateNode(Node * str, double * ptr_Mat){
 */
 	/*pave*/
 	drapeau.ID=0;
+	drapeau.col[0]=rouge[0];
+		drapeau.col[2]=rouge[2];
+			drapeau.col[1]=rouge[1];
+			drapeau.col[3]=rouge[3];
+
+
 	chassis2.ID=0;
 	/*trapeze 3D*/
 	chassis.ID=5;
@@ -692,6 +751,11 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	boule.ID=1;
 	/*cylindre*/
 	porteDrapeau.ID=2;
+	/*porteDrapeau.col=&orange;*/
+	porteDrapeau.col[0]=orange[0];
+	porteDrapeau.col[1]=orange[1];
+	porteDrapeau.col[2]=orange[2];
+	porteDrapeau.col[3]=orange[3];
 	/*cylindre*/
 	canon.ID=2;
 	/*tore*/
@@ -899,7 +963,7 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 
 
-/*Scene*/
+/*Scene*/ 
 	ptr_sc->nodes=(Node *)malloc(3*sizeof(Node));
 	ptr_sc->sonsNo=3;
 	ptr_sc->shapesNo=0;

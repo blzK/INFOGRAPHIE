@@ -15,7 +15,7 @@ double f(double input){
 	return output;
 }
 
-Shape * InitializePara(Shape * str){
+void * InitializePara(Shape * str){
 	int i,j;
 	double a=1.0/N;
 	str->pointNo=4*N;
@@ -68,29 +68,74 @@ Shape * InitializePara(Shape * str){
 
 }
 
-return str;
 }
 
+void calculateNorm(Shape * str){
+
+	int i,j;
+	double a=1.0/N;
+	str->pointNo=4*N;
+	str->normNo=N;
+	str->vrtx=malloc(4*N*sizeof(G3Xpoint));
+	str->norm=malloc(N*sizeof(G3Xvector));
+	memset(str->vrtx, 0,N*sizeof(G3Xpoint));
+	memset(str->norm, 0,N*sizeof(G3Xvector));
+
+	G3Xpoint *v2=str->vrtx;
+	G3Xpoint *vn=str->norm;
+
+
+/*PAVE*/
+
+
+	for(i=0;i<N;i++)
+	{
+
+		(*v2)[0];
+		(*v2)[1];
+		(*v2)[2];
+		v2++;
+
+		(*v2)[0];
+		(*v2)[1];
+		(*v2)[2];
+		v2++;
+
+
+		(*v2)[0]=;
+		(*v2)[1]=;
+		(*v2)[2]=;
+		v2++;
+
+		(*v2)[0];
+		(*v2)[1];
+		(*v2)[2];
+		v2++;
+
+	/*NORMALES */
+
+	/*(*vn)[0]=0;
+	(*vn)[1]=0;
+	(*vn)[2]=T;
+	vn++;*/
+
+
+}
 
 void DrawPara(Shape * str){
 
-	int i,j,k,N2,P2,l;
+	int i,j,k,l;
 	i=0;
 	j=0;
 	k=0;
-	/*
-	if(animate==true){
-	InitializeParaTransformation(str,R);	
-	}
-	*/
 
-	int stepn=N/n; int stepp=P/p;
+	int stepn=N/n; 
+	int stepp=P/p;
 
 	/*SQUELETTE PAVE*/
 	glBegin(GL_POINTS);
-	g3x_Material(bleu,ambi,diff,spec,shin,1.);
 
-	for(i=0;i<str->pointNo;i++){
+	for(i=0;i<4*N;i++){
 
 		glVertex3dv(str->vrtx[i]);
 		
@@ -103,16 +148,13 @@ void DrawPara(Shape * str){
 	glBegin(GL_QUADS);
 
 
-	g3x_Material(rouge,ambi,diff,spec,shin,1.);
-
-
 	i=4;
 	glVertex3dv(str->vrtx[i]);
 	glVertex3dv(str->vrtx[i+1]);
 	glVertex3dv(str->vrtx[i+2]);
 	glVertex3dv(str->vrtx[i+3]);
 
-	for(i=0;i<str->pointNo-7;i++){
+	for(i=0;i<4*N-7;i++){
 
 /*faces de coté ouvert*/
 		glVertex3dv(str->vrtx[i]);
@@ -130,10 +172,6 @@ void DrawPara(Shape * str){
 	glVertex3dv(str->vrtx[i+2]);
 	glVertex3dv(str->vrtx[i+3]);
 
-
-	/*g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
-
-	
 
 	glEnd(); 
 	glDisable(GL_LIGHTING);

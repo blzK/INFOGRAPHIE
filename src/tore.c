@@ -90,8 +90,9 @@ Shape * InitializeTore(Shape *str, double ratio){
 				glEnd();
 
 	/*TEXTURE TORE*/
-				glBegin(GL_QUADS);
 				glEnable(GL_LIGHTING);
+				glBegin(GL_QUADS);
+				
 				for(i=0;i<N-stepn;i+=stepn){
 					for(j=0;j<P-stepp;j+=stepp){
 
@@ -143,12 +144,12 @@ Shape * InitializeTore(Shape *str, double ratio){
 		glVertex3dv(str->vrtx[k]);
 
 	}
+
+	
 	glDisable(GL_LIGHTING);
 	glEnd();
 	/*Raccordement*/
 
-	/*glColor4fv(rouge);*/
-/*	g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
 	glBegin(GL_POLYGON);
 
 	for(j=0;j<P;j+=stepp){

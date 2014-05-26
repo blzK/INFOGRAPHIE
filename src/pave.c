@@ -115,7 +115,6 @@ void DrawPave(Shape * str){
 
 	/*SQUELETTE PAVE*/
 	glBegin(GL_POINTS);
-	g3x_Material(bleu,ambi,diff,spec,shin,1.);
 
 	for(i=0;i<8;i++){
 
@@ -127,11 +126,10 @@ void DrawPave(Shape * str){
 	glEnd();
 
 /*TEXTURE PAVE*/
-
+glEnable(GL_LIGHTING);
 	glBegin(GL_QUADS);
 
 
-	g3x_Material(bleu,ambi,diff,spec,shin,1.);
 
 	for(i=0;i<3;i++){
 
@@ -159,7 +157,6 @@ void DrawPave(Shape * str){
 	glVertex3dv(str->vrtx[7]);
 	glVertex3dv(str->vrtx[4]);
 	glNormal3dv(str->norm[3]);
-	g3x_Material(orange,ambi,diff,spec,shin,1.);
 
 /*faces du dessus*/
 
