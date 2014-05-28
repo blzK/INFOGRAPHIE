@@ -36,7 +36,11 @@ Shape * InitializeTore(Shape *str, double ratio){
 			(*vt)[1]=(rayon+str->ratio*rayon*cos(j*a))*sin(i*b);
 			(*vt)[2]=rayon*sin(j*a);
 
-			ptemp[i%4]=vt;
+			(*vn)[0]=(*vt)[0];
+			(*vn)[1]=(*vt)[1];
+			(*vn)[2]=(*vt)[2];
+			vn++;
+			/*ptemp[i%4]=vt;*/
 
 
 			vt++;
@@ -71,7 +75,7 @@ Shape * InitializeTore(Shape *str, double ratio){
 				int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE TORE*/
-				glBegin(GL_POINTS);
+				/*glBegin(GL_POINTS);
 				glDisable(GL_LIGHTING);
 
 				for(i=0;i<N;i+=stepn){
@@ -81,7 +85,7 @@ Shape * InitializeTore(Shape *str, double ratio){
 
 			/*printf("\n %f %f %f !\n",str->vrtx[k][0],str->vrtx[k][1], str->vrtx[k][2]);*/
 
-						glVertex3dv(str->vrtx[k]);
+				/*		glVertex3dv(str->vrtx[k]);
 
 
 					}

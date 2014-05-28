@@ -78,8 +78,6 @@ glEnd();*/
 	for(i=0;i<N-stepn;i+=stepn){
 		for(j=0;j<P-stepp;j+=stepp){
 
-
-
 			k = i*P+j;
 			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);

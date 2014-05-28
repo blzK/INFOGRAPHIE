@@ -10,11 +10,15 @@
 #include "sphere.c"
 #include "tore.c"
 #include "pave.c"
-#include "cylindre.c"
+#include "cylindre.c" 
+#include "para2.c"
+  
+
  #include "para.c"
+/*
  #include "qdbmp.c"
   #include "bmpfile.h" 
-  
+  */
 
 
 
@@ -70,7 +74,7 @@ void initNodeMatrix(struct Node * str){
 
 	/*g3x_MPrintHMat(*(str->Md.c));*/
 
-	}
+	}  
 
 	void initMatrix(HMat * mat){
 		mat->c=malloc(16*sizeof(double));
@@ -88,7 +92,7 @@ void initNodeMatrix(struct Node * str){
 	}
 
 	/*void InitializeShape(Shape * str){
-
+ 
 		switch (str->ID){
 			case 0:
 			InitializePave(str);
@@ -109,22 +113,24 @@ void initNodeMatrix(struct Node * str){
 			InitializePara(str);
 			break; 
 		}       
-	}
+	} 
 
 
-	/*FORMES CANONIQUES*/
-	Shape pave_canonical;
+	/*FORMES CANONIQUES*/     
+	Shape pave_canonical; 
 	Shape cylindre_canonical;
 	Shape sphere_canonical;
 	Shape tore_canonical;
 	Shape ressort_canonical;
 	Shape para_canonical;
+	Shape gauss_canonical;   
 	Shape * ptr_pave_canonical= &pave_canonical;
 	Shape * ptr_cylindre_canonical=&cylindre_canonical;
 	Shape * ptr_sphere_canonical=&sphere_canonical;
 	Shape * ptr_tore_canonical=&tore_canonical;
 	Shape * ptr_ressort_canonical=&ressort_canonical;
 	Shape * ptr_para_canonical=&para_canonical;
+	Shape * ptr_gauss_canonical=&gauss_canonical;
 
 	void InitCanonical(){
 
@@ -136,6 +142,7 @@ void initNodeMatrix(struct Node * str){
 		tore_canonical.ID=3;
 		ressort_canonical.ID=4;
 		para_canonical.ID=5;
+		gauss_canonical.ID=6;
 
 		InitializePave(&pave_canonical); 
 		InitializeCylindre(&cylindre_canonical); 
@@ -143,6 +150,7 @@ void initNodeMatrix(struct Node * str){
 		InitializeTore(&tore_canonical,0.1);
 		InitializeRessort(&ressort_canonical);
 		InitializePara(&para_canonical);
+		InitializeGauss(&gauss_canonical);
 
 		
 
@@ -159,6 +167,7 @@ constituée par la multiplication de toutes les matrices précédentes */
 Il faut faire la multiplication avec la forme canonique !
 donc sauvegarder un type canonique...
 */
+
 
 
 bool UpdateShape(Shape * str,  double *ptr_Mat){
@@ -192,6 +201,11 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 		case 5: 
 		vC=ptr_para_canonical->vrtx;
 		vCn=ptr_para_canonical->norm;
+
+		break;
+		case 6: 
+		vC=ptr_gauss_canonical->vrtx;
+		vCn=ptr_gauss_canonical->norm;
 		break;
 	} 
 
@@ -213,7 +227,7 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			printf("%lf %lf  %lf\n", (*vC)[0],(*vC)[1],(*vC)[2]);
 		}*/
 		}
-
+ 
 		for (q = 0; q < str->normNo; ++q){
 			g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
 		/*Transformation des normales*/
@@ -230,16 +244,16 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 	}  
 
 	void DrawShape(Shape * str){
-		printf("%f\n", str->col[0]);
-		
+		/*printf("%f\n", str->col[0]);*/         
+
 		if(str->col[0]==0.00){
 			g3x_Material(vertKaki,ambi,diff,spec,shin,alpha);
 			/*glColor4fv(rouge);  */
-			printf("in loop\n");
+		/*	printf("in loop\n");*/
 		}else{
 			g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
 		}
-		/*  ;*/
+		/*  ;*/   
 		/*
 
 	/*printf("drawing shape %d\n", str->ID);*/
@@ -247,7 +261,7 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			case 0: 
 			DrawPave(str);
 			break;
-			case 1:  
+			case 1:         
 			DrawSphere(str);
 			break;
 			case 2:     
@@ -262,6 +276,10 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			case 5: 
 			DrawPara(str);   
 			break;
+			case 6: 
+			DrawGauss(str);   
+			break;
+
 		}        
 	}
 
@@ -619,14 +637,24 @@ void UpdateNode(Node * str, double * ptr_Mat){
 	Shape roueDroite;
 	static Shape *ptr_roueDroite=&roueDroite;
 
+	Shape mont;
+	static Shape *ptr_mont=&mont;
+
+
+	Shape sol;
+	static Shape *ptr_sol=&sol;
+
+
+
 	struct Node scene;
 	struct Node *ptr_sc= &scene;
 
-
 	struct Node n1;
 	struct Node *ptr_n1= &n1;
+
 	struct Node n2;
 	struct Node *ptr_n2= &n2;
+
 	/*Tourelle*/
 	struct Node n3;
 	struct Node *ptr_n3= &n3;
@@ -657,18 +685,33 @@ void UpdateNode(Node * str, double * ptr_Mat){
 
 	struct Node n4;
 	struct Node *ptr_n4= &n4;
+
 	struct Node n5;
 	struct Node *ptr_n5= &n5;
+
 	struct Node n6;
 	struct Node *ptr_n6= &n6;
+
 	struct Node n7;
 	struct Node *ptr_n7= &n7;
+
 	struct Node n8;
 	struct Node *ptr_n8= &n8;
+
 	struct Node nchassis2;
 	struct Node *ptr_nchassis2= &nchassis2;
 
+	struct Node nmont;
+	struct Node *ptr_nmont= &nmont;
 
+	struct Node nsol;
+	struct Node *ptr_nsol= &nsol;
+
+	struct Node ndecor;
+	struct Node *ptr_ndecor= &ndecor;
+
+	struct Node sceneTotale;
+	struct Node *ptr_sceneTotale= &sceneTotale;
 
 
 	void Init(void){
@@ -719,10 +762,10 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
     bmp_set_pixel(bmp, i, j + 1, pixel);
   }
 */
-		InitCanonical();
+  InitCanonical();
 
-		ptr_currMat =currMat.c;
-		ptr_currMat=malloc(16*sizeof(double)); 
+  ptr_currMat =currMat.c;
+  ptr_currMat=malloc(16*sizeof(double)); 
 	/*R0[0]=0;e
 	R0[1]=0;  
 	R0[2]=0;
@@ -731,18 +774,20 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	g3x_MakeIdentity(ptr_currMat);
 	/*glMatrixMode(GL_MODELVIEW);
 	glGetDoublev( GL_MODELVIEW, ptr_currMat);
-*/
-	/*pave*/
+*/  
+ 	/*pave*/
 	drapeau.ID=0;
 	drapeau.col[0]=rouge[0];
-		drapeau.col[2]=rouge[2];
-			drapeau.col[1]=rouge[1];
-			drapeau.col[3]=rouge[3];
+	drapeau.col[2]=rouge[2];
+	drapeau.col[1]=rouge[1];
+	drapeau.col[3]=rouge[3];
 
 
 	chassis2.ID=0;
+	sol.ID=0;
 	/*trapeze 3D*/
 	chassis.ID=5;
+	mont.ID=6; 
 	tourelle.ID=5;
 	tourelle2.ID=5;
 	tourelle3.ID=5;
@@ -766,6 +811,7 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 
 
 	InitializePara(ptr_chassis);
+	InitializeGauss(ptr_mont);
 	InitializePara(ptr_tourelle);
 	InitializePara(ptr_tourelle2);
 	InitializePara(ptr_tourelle3);
@@ -779,6 +825,7 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	InitializePave(ptr_chassis2);
 	InitializeSphere(ptr_boule);
 	InitializePave(ptr_drapeau);
+	InitializePave(ptr_sol);
 
 
 
@@ -956,8 +1003,39 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	ptr_n7->nodes[1]=nchassis2;
 	ptr_n7->nodes[2]=nensembleDrapeau;
 	initNodeMatrix(ptr_n7);
+/***************************************/
 
 
+/*mont*/ 
+	
+	ptr_nmont->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_nmont->shapesNo=1;
+	ptr_nmont->sonsNo=0;
+	ptr_nmont->type=0;
+	ptr_nmont->shapes[0]=mont;
+	initNodeMatrix(ptr_nmont);
+
+
+/*sol*/ 
+	
+	ptr_nsol->shapes=(Shape *)malloc(1*sizeof(Shape));
+	ptr_nsol->shapesNo=1;
+	ptr_nsol->sonsNo=0;
+	ptr_nsol->type=0;
+	ptr_nsol->shapes[0]=sol;
+	initNodeMatrix(ptr_nsol);
+
+/***************************************/
+
+
+/*decor*/ 
+	ptr_ndecor->nodes=(Node *)malloc(2*sizeof(Node));
+	ptr_ndecor->sonsNo=2;
+	ptr_ndecor->shapesNo=0;
+	ptr_ndecor->type=2;
+	ptr_ndecor->nodes[0]=nmont;
+	ptr_ndecor->nodes[1]=nsol;
+	initNodeMatrix(ptr_ndecor);
 
 /***************************************/
 
@@ -973,6 +1051,14 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	ptr_sc->nodes[2]=n2;
 	initNodeMatrix(ptr_sc);
 
+
+	ptr_sceneTotale->nodes=(Node *)malloc(2*sizeof(Node));
+	ptr_sceneTotale->sonsNo=2;
+	ptr_sceneTotale->shapesNo=0;
+	ptr_sceneTotale->type=2;
+	ptr_sceneTotale->nodes[0]=scene;
+	ptr_sceneTotale->nodes[1]=ndecor;       
+	initNodeMatrix(ptr_sceneTotale);
 
 
 /***************************************/
@@ -1014,6 +1100,9 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 
 	HMat anim;  
 
+/*******************/
+/********TANK*******/
+/*******************/
 /*Ceanon n4 + tourelle n3 + tuorelle2  3 4*/
 
 	double trans_n1[3]={0,0,0.15}; 
@@ -1028,21 +1117,32 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	double tr_ntourelleC[3]={0,-0.25,0};
 	double hom_ntourelleC[3]= {0.5,1,0.2};
 
-	double tr_n3[3]={0,0.5,0.5}; 
-	double homo_n3[3]= {1,1,1};
+	
 
+                /*???*/
 	double tr_n4[3]={0,0.5,0.5}; 
 	double rot_n4[3]= {1.57,0.,0.};
 	double homo_n4[3]={0.15,2,0.15};
+/*bas*/
+	
+
 
 	double tr_ntourelle2[3]={0,0.5,0.5}; 
 	double rot_ntourelle2[3]= {0,-PI,0};
 	
+	double tr_ntourelle4[3]={0,-0.5,0.5}; 
+	double rot_ntourelle4[3]= {PI,0,0};	
+
+
+	/*haut*/
+	double tr_n3[3]={0,0.5,0.5}; 
+	double homo_n3[3]= {1,1,1};
+	
+
 	double tr_ntourelle3[3]={0,-0.5,0.5}; 
 	double rot_ntourelle3[3]= {0,0,PI};
 	
-	double tr_ntourelle4[3]={0,-0.5,0.5}; 
-	double rot_ntourelle4[3]= {PI,0,0};
+	
 	
 	
 
@@ -1105,6 +1205,8 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 
 /*Chassis */
 
+
+
 	double n8_homo[3]={2,1.4,0.4};
 	double tr_n8[3]={-1,0,-0.1}; 
 	MakeTransformation(ptr_n8,NULL,NULL,n8_homo);
@@ -1118,7 +1220,7 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	double tr_nensembleDrapeau[3]={-0.8,0.25,0.2}; 
 	MakeTransformation(ptr_nensembleDrapeau,tr_nensembleDrapeau,NULL,NULL);
 
-	double hom_porteDrapeau[3]={0.01,0.01,0.2};
+	double hom_porteDrapeau[3]={0.01,0.01,0.18};
 	double tr_porteDrapeau[3]={0,0,0}; 
 	MakeTransformation(ptr_nporteDrapeau,NULL,NULL,hom_porteDrapeau);
 	MakeTransformation(ptr_nporteDrapeau,tr_porteDrapeau,NULL,NULL);
@@ -1130,18 +1232,37 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	MakeTransformation(ptr_nboule,tr_boule,NULL,NULL);
 
 
-	double hom_drapeau[3]={0.1,0.002,0.05};
-	double tr_drapeau[3]={-0.05,0,0.06}; 
+	double hom_drapeau[3]={0.1,0.002,0.05}; 
+	double tr_drapeau[3]={-0.05,0,0.055}; 
 	MakeTransformation(ptr_ndrapeau,NULL,NULL,hom_drapeau);
 	MakeTransformation(ptr_ndrapeau,tr_drapeau,NULL,NULL);
 
 
+/**Mont***/
+	double hom_mont[3]={3,3,5};
+	double tr_mont[3]={10,10,-0.70}; 
+	MakeTransformation(ptr_nmont,NULL,NULL,hom_mont);
+	MakeTransformation(ptr_nmont,tr_mont,NULL,NULL);
 
 
+/*******************/
+/********DECOR*******/
+/*******************/
 
+
+	/*double hom_decor[3]={5.,5.,1.};
+	double tr_decor[3]={0,0,-5}; 
+	MakeTransformation(ptr_ndecor,NULL,NULL,hom_decor);
+	MakeTransformation(ptr_ndecor,tr_decor,NULL,NULL);
+*/
+
+	double tr_sol[3]={0,0,-0.73}; 
+	double hom_sol[3]={100.,100.,0.01};
+	MakeTransformation(ptr_nsol,NULL,NULL,hom_sol);
+	MakeTransformation(ptr_nsol,tr_sol,NULL,NULL);
 
 	initMatrix(&anim); 
-	UpdateNode(ptr_sc,anim.c);
+	UpdateNode(ptr_sceneTotale ,anim.c);
 
 
 
@@ -1297,7 +1418,9 @@ void Anim(void)
 	g3x_ProdHMat(temp2.c, ptr_n1->Mi.c, ptr_n1->Mi.c);
 */
 
-
+	/*double tr_anim[3]= {00.01,0,0.};
+	MakeTransformation(ptr_sc,tr_anim,NULL,NULL);
+*/   
 	double rot_anim[3]= {0,0,0.02};
 	MakeTransformation(ptr_n1,NULL,rot_anim,NULL);
 	i+=0.1;
@@ -1328,7 +1451,7 @@ static void Dessin(void)
 {	
 
 
-	/*glEnable(GL_LIGHTING);*/
+	/*glEnable(GL_LIGHT ING);*/
 
 	/*glPushMatrix(); */
 	/*glScalef(0.5,0.5,0.5);*/
@@ -1337,8 +1460,8 @@ static void Dessin(void)
 	/*g3x_MakeIdentity(anim.c);*/ 
 	glPointSize(r);  
 /*	printf("Entering DrawNodes\n");*/
-	DrawNodes(ptr_sc);
-	/*printf("Exiting DrawNodes\n");*/
+	DrawNodes(ptr_sceneTotale);     
+	/* printf("Exiting DrawNodes\n");*/
 
 	/*glTranslatef(0.,0.,-10);
 	glRotatef(10.,-110.,0.,0.); */ 

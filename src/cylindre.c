@@ -79,20 +79,22 @@ void DrawCylindre(Shape * str){
 		for(j=0;j<P-stepp;j+=stepp){
 
 			k = i*P+j;
-			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
 
 			k = i*P + (j+stepp);
-			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
 
 			k = (i+stepn)*P+(j+stepp);
-			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
+
 
 			k = (i+stepn)*P + j; 
-			glNormal3dv(str->norm[k]);
 			glVertex3dv(str->vrtx[k]);
+			glNormal3dv(str->norm[k]);
+			
 
 		}
 
