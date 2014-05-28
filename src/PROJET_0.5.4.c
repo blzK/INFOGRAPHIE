@@ -3,7 +3,7 @@
   ============================================================= */
 
 #include <stdio.h>
-#include <g3x.h>
+#include <g3x.h>   
 #include "const.h"
 #include "shape.h"
 #include "ressort.c"
@@ -13,7 +13,7 @@
 #include "cylindre.c" 
 #include "para2.c"
   
-
+ 
  #include "para.c"
 /*
  #include "qdbmp.c"
@@ -54,7 +54,7 @@ typedef struct Node{
 
 
 void initNodeMatrix(struct Node * str){
-	str->Md.c=malloc(16*sizeof(double));
+	str->Md.c=malloc(16*sizeof(double));     
 	str->Mi.c=malloc(16*sizeof(double));
 	str->Mn.c=malloc(16*sizeof(double));
 	memset(str->Md.c, 0,16*sizeof(double));
@@ -90,14 +90,14 @@ void initNodeMatrix(struct Node * str){
 		memset(mat->c, 0,16*sizeof(double));
 
 	}
-
+       
 	/*void InitializeShape(Shape * str){
  
 		switch (str->ID){
 			case 0:
 			InitializePave(str);
 			break;
-			case 1:
+			case 1:      
 			InitializeSphere(str);
 			break;
 			case 2:
@@ -251,7 +251,7 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			/*glColor4fv(rouge);  */
 		/*	printf("in loop\n");*/
 		}else{
-			g3x_Material(str->col,ambi,diff,spec,shin,alpha);
+			g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,alpha);
 		}
 		/*  ;*/   
 		/*
@@ -781,24 +781,45 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	drapeau.col[2]=rouge[2];
 	drapeau.col[1]=rouge[1];
 	drapeau.col[3]=rouge[3];
-
+	drapeau.diff=1.;
+	drapeau.spec=0.3;
+	drapeau.shine=0.;
+	drapeau.ambi=0.;
 
 	chassis2.ID=0;
 	chassis2.col[0]=grisMetal[0];
 	chassis2.col[2]=grisMetal[2];
 	chassis2.col[1]=grisMetal[1];
 	chassis2.col[3]=0.;
+	chassis2.diff=1.;
+	chassis2.spec=0.3;
+	chassis2.shine=0.1;
+	chassis2.ambi=0.2;
+
+
 	sol.ID=0;
 	sol.col[0]=vertSol[0];
 	sol.col[2]=vertSol[2];
 	sol.col[1]=vertSol[1];
 	sol.col[3]=0.;
+	sol.diff=0.7;
+	sol.spec=0.0;
+	sol.shine=0.;
+	sol.ambi=0.3;
+
+
+
+
 	/*trapeze 3D*/
 	chassis.ID=5;
 	chassis.col[0]=grisMetal[0];
 	chassis.col[2]=grisMetal[2];
 	chassis.col[1]=grisMetal[1];
 	chassis.col[3]=0.;
+	chassis.diff=0.5;
+	chassis.spec=0.6;
+	chassis.shine=1.;
+	chassis.ambi=0.1;
 
 
 	mont.ID=6; 
@@ -806,6 +827,11 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	mont.col[2]=marronMont[2];
 	mont.col[1]=marronMont[1];   
 	mont.col[3]=0.;
+	mont.diff=1.;
+	mont.spec=0.;
+	mont.shine=0.;
+	mont.ambi=0.4;
+
 	tourelle.ID=5;
 	tourelle2.ID=5;
 	tourelle3.ID=5;
@@ -816,6 +842,11 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	boule.col[1]=orange[1];
 	boule.col[2]=orange[2];
 	boule.col[3]=orange[3];
+	boule.diff=1.;
+	boule.spec=1.;
+	boule.shine=1.;
+	boule.ambi=1.;
+
 	/*cylindre*/
 	porteDrapeau.ID=2;
 	/*porteDrapeau.col=&orange;*/
@@ -823,24 +854,40 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	porteDrapeau.col[1]=orange[1];
 	porteDrapeau.col[2]=orange[2];
 	porteDrapeau.col[3]=orange[3];
+	porteDrapeau.diff=1.;
+	porteDrapeau.spec=1.;
+	porteDrapeau.shine=1.;
+	porteDrapeau.ambi=1.;
 	/*cylindre*/  
 	canon.ID=2;
 	canon.col[0]=vertKaki[0];
 	canon.col[2]=vertKaki[2];
 	canon.col[1]=vertKaki[1];
 	canon.col[3]=0.;
+	canon.diff=1.;
+	canon.spec=0.8;
+	canon.shine=0.8;
+	canon.ambi=0.3;
 	/*tore*/
 	roueGauche.ID=3;
 	roueGauche.col[0]=vertFonce[0];
 	roueGauche.col[1]=vertFonce[1];
 	roueGauche.col[2]=vertFonce[2];
 	roueGauche.col[3]=vertFonce[3];
+	roueGauche.diff=1.;
+	roueGauche.spec=0.6;
+	roueGauche.shine=0.9;
+	roueGauche.ambi=0.5;
 
 	roueDroite.ID=3;
 	roueDroite.col[0]=vertFonce[0];
 	roueDroite.col[1]=vertFonce[1];
 	roueDroite.col[2]=vertFonce[2];
 	roueDroite.col[3]=vertFonce[3];  
+	roueDroite.diff=1.;
+	roueDroite.spec=0.6;
+	roueDroite.shine=0.9;
+	roueDroite.ambi=0.5;
 	/*ressort*/
 	/*r1.ID=4;*/
 
@@ -1593,7 +1640,7 @@ static void camera_info(void)
 }
 
 int main(int argc, char** argv)
-{  
+{     
 
   /* initialisation de la fenêtre graphique et paramétrage Gl */
 	g3x_InitWindow(*argv,768,512);
@@ -1603,7 +1650,7 @@ int main(int argc, char** argv)
 	g3x_SetPerspective(40.,100.,1.);
   /* position, orientation de la caméra */
 	/*g3x_SetCameraSpheric(0.25*PI,+0.25*PI,20.,(G3Xpoint){0.,0.,0.});*/
-	g3x_SetCameraSpheric(0.25*PI,+0.25*PI,10.,(G3Xpoint){0.,0.,0.});
+	g3x_SetCameraSpheric(-0.25*PI,0.25*PI,5.,(G3Xpoint){0.,0.,0.});
   /* fixe les param. colorimétriques du spot lumineux */
 	/* lumiere blanche (c'est les valeurs par defaut)   */	
 	g3x_SetLightAmbient (1,1.,1.);

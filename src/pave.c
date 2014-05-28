@@ -136,8 +136,11 @@ void DrawPave(Shape * str){
 /*faces de coté ouvert*/
 		glNormal3dv(str->norm[i]);
 		glVertex3dv(str->vrtx[i]);
+		glNormal3dv(str->norm[i]);
 		glVertex3dv(str->vrtx[i+1]);
+		glNormal3dv(str->norm[i]);
 		glVertex3dv(str->vrtx[i+5]);
+		glNormal3dv(str->norm[i]);
 		glVertex3dv(str->vrtx[i+4]);
 
 		
@@ -154,24 +157,33 @@ void DrawPave(Shape * str){
 /*on ferme le coté */
 glNormal3dv(str->norm[3]);
 	glVertex3dv(str->vrtx[0]);
+	glNormal3dv(str->norm[3]);
 	glVertex3dv(str->vrtx[3]);
+	glNormal3dv(str->norm[3]);
 	glVertex3dv(str->vrtx[7]);
+	glNormal3dv(str->norm[3]);
 	glVertex3dv(str->vrtx[4]);
 	
 
 /*faces du dessus*/
 glNormal3dv(str->norm[4]);
 	glVertex3dv(str->vrtx[0]);
+	glNormal3dv(str->norm[4]);
 	glVertex3dv(str->vrtx[1]);
+	glNormal3dv(str->norm[4]);
 	glVertex3dv(str->vrtx[2]);
+	glNormal3dv(str->norm[4]);
 	glVertex3dv(str->vrtx[3]);
 	
 	
 /*face d'en bas*/
 glNormal3dv(str->norm[5]);
 	glVertex3dv(str->vrtx[4]);
+	glNormal3dv(str->norm[5]);
 	glVertex3dv(str->vrtx[5]);
+	glNormal3dv(str->norm[5]);
 	glVertex3dv(str->vrtx[6]);
+	glNormal3dv(str->norm[5]);
 	glVertex3dv(str->vrtx[7]);
 	
 

@@ -1,5 +1,5 @@
 
-#define N 200
+int N =200;
 #define P 200
 #define T 1
 #define U 50

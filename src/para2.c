@@ -1,3 +1,51 @@
+void calculateNormGauss(Shape * str){
+
+	int i,j;
+	double a=1.0/N;
+	str->norm=malloc(N*P*sizeof(G3Xvector));
+	memset(str->norm, 0,N*P*sizeof(G3Xvector));
+
+	G3Xpoint *v2=str->vrtx;
+	G3Xpoint *vn=str->norm;
+	/*G3Xpoint *ptemp;
+	ptemp=malloc(3*sizeof(G3Xpoint));
+*/
+	G3Xpoint ptemp[3];
+
+/*PAVE*/
+
+
+	int stepn=N/n; int stepp=P/p; int k;
+	for(i=0;i<N-stepn;i+=stepn){
+		for(j=0;j<P-stepp;j+=stepp){
+
+			k = i*P+j;
+			(ptemp[0])[0]=(v2[k])[0];
+			(ptemp[0])[1]=(v2[k])[1];
+			(ptemp[0])[2]=(v2[k])[2];
+
+			k = i*P + (j+stepp);
+			(ptemp[1])[0]=(v2[k])[0];
+			(ptemp[1])[1]=(v2[k])[1];
+			(ptemp[1])[2]=(v2[k])[2];
+
+			/*k = (i+stepn)*P+(j+stepp);
+
+			(ptemp[2])[0]=(v2[k])[0];
+			(ptemp[2])[1]=(v2[k])[1];
+			(ptemp[2])[2]=(v2[k])[2];
+
+			k = (i+stepn)*P + j; */
+
+			G3Xmid(ptemp[2],v2[(i+stepn)*P+(j+stepp)],v2[(i+stepn)*P + j]);
+			G3Xprodvect3point((*vn),ptemp[0],ptemp[1],ptemp[2]);
+
+		}
+	}
+
+}
+
+
 Shape * InitializeGauss(Shape * str){
 	int i,j;
 	int offset=3.;
@@ -33,24 +81,19 @@ Shape * InitializeGauss(Shape * str){
 		}
 
 	}
-
+	calculateNormGauss(str);
 	return str;
 }
 
 
 void DrawGauss(Shape * str){
-
-	int i,j,k,N2,P2,l;
+/*calculateNormGauss(str);*/
+	int i,j,k,N2,P2,l,k2;
 	i=0;
 	j=0;
 	k=0;
-/*
-if(animate==true){
-InitializeGaussTransformation(str,R);	
-}
-*/
 
-int stepn=N/n; int stepp=P/p;
+	int stepn=N/n; int stepp=P/p;
 
 /*SQUELETTE PAVE*/
 /*glBegin(GL_POINTS);
@@ -68,41 +111,32 @@ glEnd();
 glEnable(GL_LIGHTING);
 glBegin(GL_QUADS);
 
-/*
-for(i=0;i<str->pointNo;i++){
-
-/*faces de coté ouvert*/
-	/*glVertex3dv(str->vrtx[i]);
-
-	glNormal3dv(str->norm[i]);
-
-}
-
 
 /*g3x_Material(rouge,ambi,diff,spec,shin,1.);*/
 
-	for(i=0;i<N-stepn;i+=stepn){
-		for(j=0;j<P-stepp;j+=stepp){
+for(i=0;i<N-stepn;i+=stepn){
+	for(j=0;j<P-stepp;j+=stepp){
 
 
 
-			k = i*P+j;
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = i*P+j;
+		k2 = i*P+j;
+		glNormal3dv(str->norm[k2]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = i*P + (j+stepp);
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = i*P + (j+stepp);
+		glNormal3dv(str->norm[k2]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = (i+stepn)*P+(j+stepp);
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = (i+stepn)*P+(j+stepp);
+		glNormal3dv(str->norm[k2]);
+		glVertex3dv(str->vrtx[k]);
 
-			k = (i+stepn)*P + j; 
-			glNormal3dv(str->norm[k]);
-			glVertex3dv(str->vrtx[k]);
+		k = (i+stepn)*P + j; 
+		glNormal3dv(str->norm[k2]);
+		glVertex3dv(str->vrtx[k]);
 
-		}
+	}
 }
 
 glEnd(); 
