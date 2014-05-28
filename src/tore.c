@@ -27,10 +27,10 @@ Shape * InitializeTore(Shape *str, double ratio){
 	G3Xpoint *ptemp[4];
 
 
-	for(i=0;i<=N;i++)
+	for(i=0;i<N;i++)
 	{
 
-		for (j=0;j<=P;j++)
+		for (j=0;j<P;j++)
 		{
 			(*vt)[0]=(rayon+str->ratio*rayon*cos(j*a))*(cos(i*b));
 			(*vt)[1]=(rayon+str->ratio*rayon*cos(j*a))*sin(i*b);
@@ -175,12 +175,6 @@ Shape * InitializeTore(Shape *str, double ratio){
 
 		k = i*P+j+stepp;
 		glVertex3dv(str->vrtx[k]);
-
-
-
-
-		
-		
 
 
 	}

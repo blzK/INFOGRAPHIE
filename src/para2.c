@@ -53,7 +53,7 @@ InitializeGaussTransformation(str,R);
 int stepn=N/n; int stepp=P/p;
 
 /*SQUELETTE PAVE*/
-glBegin(GL_POINTS);
+/*glBegin(GL_POINTS);
 g3x_Material(bleu,ambi,diff,spec,shin,1.);
 
 for(i=0;i<N*P;i++){
@@ -63,13 +63,10 @@ for(i=0;i<N*P;i++){
 }
 
 glEnd();
-
+*/
 /*TEXTURE PAVE*/
 glEnable(GL_LIGHTING);
 glBegin(GL_QUADS);
-
-
-g3x_Material(rouge,ambi,diff,spec,shin,1.);
 
 /*
 for(i=0;i<str->pointNo;i++){

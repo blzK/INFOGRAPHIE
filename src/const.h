@@ -13,11 +13,20 @@ static double r=1;
 static G3Xcolor rouge  ={1.0,0.0,0.0};
 static G3Xcolor jaune  ={1.0,1.0,0.0};
 static G3Xcolor vert   ={0.0,1.0,0.0};
-static G3Xcolor vertKaki   ={35./255.,77./255.,32./255.};
-static G3Xcolor grisMetal   ={0.0,1.0,0.0};
 static G3Xcolor cyan   ={0.0,1.0,1.0};
 static G3Xcolor bleu   ={0.0,0.0,1.0};
 static G3Xcolor magenta={1.0,0.0,1.0};
+
+/* Couleurs définies */
+
+/*Char*/
+static G3Xcolor vertKaki   ={9./255.,94./255.,9./255.};
+static G3Xcolor grisMetal   ={9./255.,120./255.,9./255.};
+
+/*sol*/
+static G3Xcolor marronMont   ={102./255.,51./255.,0./255.};
+static G3Xcolor vertSol   ={102./255.,204./255.,0./255.};
+static G3Xcolor vertFonce   ={11./255.,36./255.,7./255.};
 
 /* paramètres géométriques */
 static double angle= 0.00;

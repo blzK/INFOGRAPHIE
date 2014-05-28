@@ -114,7 +114,7 @@ void DrawPave(Shape * str){
 	int stepn=N/n; int stepp=P/p;
 
 	/*SQUELETTE PAVE*/
-	glBegin(GL_POINTS);
+/*	glBegin(GL_POINTS);
 
 	for(i=0;i<8;i++){
 
@@ -124,9 +124,9 @@ void DrawPave(Shape * str){
 	}
 	
 	glEnd();
-
+*/
 /*TEXTURE PAVE*/
-glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	glBegin(GL_QUADS);
 
 
@@ -134,12 +134,13 @@ glEnable(GL_LIGHTING);
 	for(i=0;i<3;i++){
 
 /*faces de coté ouvert*/
+		glNormal3dv(str->norm[i]);
 		glVertex3dv(str->vrtx[i]);
 		glVertex3dv(str->vrtx[i+1]);
 		glVertex3dv(str->vrtx[i+5]);
 		glVertex3dv(str->vrtx[i+4]);
 
-		glNormal3dv(str->norm[i]);
+		
 
 	}
 
@@ -151,28 +152,28 @@ glEnable(GL_LIGHTING);
 
 
 /*on ferme le coté */
-
+glNormal3dv(str->norm[3]);
 	glVertex3dv(str->vrtx[0]);
 	glVertex3dv(str->vrtx[3]);
 	glVertex3dv(str->vrtx[7]);
 	glVertex3dv(str->vrtx[4]);
-	glNormal3dv(str->norm[3]);
+	
 
 /*faces du dessus*/
-
+glNormal3dv(str->norm[4]);
 	glVertex3dv(str->vrtx[0]);
 	glVertex3dv(str->vrtx[1]);
 	glVertex3dv(str->vrtx[2]);
 	glVertex3dv(str->vrtx[3]);
-	glNormal3dv(str->norm[4]);
+	
 	
 /*face d'en bas*/
-
+glNormal3dv(str->norm[5]);
 	glVertex3dv(str->vrtx[4]);
 	glVertex3dv(str->vrtx[5]);
 	glVertex3dv(str->vrtx[6]);
 	glVertex3dv(str->vrtx[7]);
-	glNormal3dv(str->norm[5]);
+	
 
 
 	glEnd();

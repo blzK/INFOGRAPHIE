@@ -24,11 +24,6 @@ Shape * InitializeSphere(Shape * str){
 			(*vt)[2]=cos(j*b);
 
 /*normale sphere*/
-			/*
-			(*vn)[0]=r*cos(i*a);
-			(*vn)[1]=r*sin(i*a);
-			(*vn)[2]=r*cos(j*b);
-*/
 
 			(*vn)[0]=cos(i*a)*sin(j*b);
 			(*vn)[1]=sin(i*a)*sin(j*b);

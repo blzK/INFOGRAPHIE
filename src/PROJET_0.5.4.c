@@ -227,7 +227,7 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			printf("%lf %lf  %lf\n", (*vC)[0],(*vC)[1],(*vC)[2]);
 		}*/
 		}
- 
+
 		for (q = 0; q < str->normNo; ++q){
 			g3x_ProdHMatPoint(ptr_Mat, *vCn, ResultPoint2);
 		/*Transformation des normales*/
@@ -251,7 +251,7 @@ bool UpdateShape(Shape * str,  double *ptr_Mat){
 			/*glColor4fv(rouge);  */
 		/*	printf("in loop\n");*/
 		}else{
-			g3x_Material(str->col,str->ambi,str->diff,str->spec,str->shine,str->alpha);
+			g3x_Material(str->col,ambi,diff,spec,shin,alpha);
 		}
 		/*  ;*/   
 		/*
@@ -784,16 +784,38 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 
 
 	chassis2.ID=0;
+	chassis2.col[0]=grisMetal[0];
+	chassis2.col[2]=grisMetal[2];
+	chassis2.col[1]=grisMetal[1];
+	chassis2.col[3]=0.;
 	sol.ID=0;
+	sol.col[0]=vertSol[0];
+	sol.col[2]=vertSol[2];
+	sol.col[1]=vertSol[1];
+	sol.col[3]=0.;
 	/*trapeze 3D*/
 	chassis.ID=5;
+	chassis.col[0]=grisMetal[0];
+	chassis.col[2]=grisMetal[2];
+	chassis.col[1]=grisMetal[1];
+	chassis.col[3]=0.;
+
+
 	mont.ID=6; 
+	mont.col[0]=marronMont[0];
+	mont.col[2]=marronMont[2];
+	mont.col[1]=marronMont[1];   
+	mont.col[3]=0.;
 	tourelle.ID=5;
 	tourelle2.ID=5;
 	tourelle3.ID=5;
-	tourelle4.ID=5;
+	tourelle4.ID=5; 
 	/*sphere*/
 	boule.ID=1;
+	boule.col[0]=orange[0];
+	boule.col[1]=orange[1];
+	boule.col[2]=orange[2];
+	boule.col[3]=orange[3];
 	/*cylindre*/
 	porteDrapeau.ID=2;
 	/*porteDrapeau.col=&orange;*/
@@ -801,11 +823,24 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	porteDrapeau.col[1]=orange[1];
 	porteDrapeau.col[2]=orange[2];
 	porteDrapeau.col[3]=orange[3];
-	/*cylindre*/
+	/*cylindre*/  
 	canon.ID=2;
+	canon.col[0]=vertKaki[0];
+	canon.col[2]=vertKaki[2];
+	canon.col[1]=vertKaki[1];
+	canon.col[3]=0.;
 	/*tore*/
 	roueGauche.ID=3;
+	roueGauche.col[0]=vertFonce[0];
+	roueGauche.col[1]=vertFonce[1];
+	roueGauche.col[2]=vertFonce[2];
+	roueGauche.col[3]=vertFonce[3];
+
 	roueDroite.ID=3;
+	roueDroite.col[0]=vertFonce[0];
+	roueDroite.col[1]=vertFonce[1];
+	roueDroite.col[2]=vertFonce[2];
+	roueDroite.col[3]=vertFonce[3];  
 	/*ressort*/
 	/*r1.ID=4;*/
 
@@ -1184,8 +1219,8 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 	double trans_n2[3]={0,0,-0.45};
 	double rot_n2[3]= {PI/2,0,0};
 	double hom_n2[3]={2,0.5,0.3};
-	double trans_n5[3]={0,0,-2};
-	double trans_n6[3]={0,0,2}; 
+	double trans_n5[3]={0,0,-2.5};
+	double trans_n6[3]={0,0,2.5}; 
 
 
 	/*MakeTransformation(ptr_n6,trans_n6,NULL,NULL);*/
@@ -1240,7 +1275,7 @@ uint32_t bmp_get_depth(bmpfile_t *bmp);/
 
 /**Mont***/
 	double hom_mont[3]={3,3,5};
-	double tr_mont[3]={10,10,-0.70}; 
+	double tr_mont[3]={10,10,-0.80}; 
 	MakeTransformation(ptr_nmont,NULL,NULL,hom_mont);
 	MakeTransformation(ptr_nmont,tr_mont,NULL,NULL);
 
@@ -1568,7 +1603,7 @@ int main(int argc, char** argv)
 	g3x_SetPerspective(40.,100.,1.);
   /* position, orientation de la caméra */
 	/*g3x_SetCameraSpheric(0.25*PI,+0.25*PI,20.,(G3Xpoint){0.,0.,0.});*/
-	g3x_SetCameraSpheric(0.25*PI,+0.25*PI,6.,(G3Xpoint){0.,0.,0.});
+	g3x_SetCameraSpheric(0.25*PI,+0.25*PI,10.,(G3Xpoint){0.,0.,0.});
   /* fixe les param. colorimétriques du spot lumineux */
 	/* lumiere blanche (c'est les valeurs par defaut)   */	
 	g3x_SetLightAmbient (1,1.,1.);
@@ -1580,7 +1615,7 @@ int main(int argc, char** argv)
 	/*g3x_SetLightPosition (0.,0.,10.);
 	g3x_SetLightDirection( 0, 0, -1);  
 */
-	g3x_SetLightPosition (0.,10.,10.);
+	g3x_SetLightPosition (0.,20.,20.);
 	g3x_SetLightDirection( 0, 0, 0);  
 
   /* définition des fonctions */
@@ -1590,7 +1625,7 @@ int main(int argc, char** argv)
 
 
 	/* JUSTE POUT ILLUSTRATION DU TRACEUR D'ALLOC EN COMPIL DEGUG */
-	void* ptr=malloc(1);
+	void* ptr=malloc(1); 
 
 	/* boucle d'exécution principale */
 	return g3x_MainStart();
