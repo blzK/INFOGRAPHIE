@@ -1,5 +1,4 @@
 void calculateNormGauss(Shape * str){
-
 	int i,j;
 	double a=1.0/N;
 	str->norm=malloc(N*P*sizeof(G3Xvector));
@@ -51,7 +50,8 @@ Shape * InitializeGauss(Shape * str){
 	int offset=3.;
 	double a=6./N;
 	double b=6./N;
-
+	/*N=N*(str->detail);
+	P=P*(str->detail);*/
 	str->pointNo=N*P;
 	str->normNo=N*P;
 	str->vrtx=malloc(P*N*sizeof(G3Xpoint));
@@ -82,12 +82,16 @@ Shape * InitializeGauss(Shape * str){
 
 	}
 	calculateNormGauss(str);
+	N=N_default;
+	P=P_default;
 	return str;
 }
 
 
 void DrawGauss(Shape * str){
 /*calculateNormGauss(str);*/
+	N=N*(str->detail);
+	P=P*(str->detail);
 	int i,j,k,N2,P2,l,k2;
 	i=0;
 	j=0;
@@ -141,5 +145,7 @@ for(i=0;i<N-stepn;i+=stepn){
 
 glEnd(); 
 glDisable(GL_LIGHTING);
+N=N_default;
+P=P_default;
 
 }

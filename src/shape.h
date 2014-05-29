@@ -13,6 +13,7 @@ typedef struct Shape
 	int pointNo; /*Nombre de vertex*/
 	int normNo; /*Nombre de normales*/
 	double ratio;
+	int detail;
 } Shape;
 
 

@@ -72,6 +72,7 @@ void calculateNormPara(Shape * str){
 void * InitializePara(Shape * str){
 	int i,j;
 	double a=1.0/N;
+	str->detail=1;
 	str->pointNo=4*N;
 	str->vrtx=malloc(4*N*sizeof(G3Xpoint));
 	memset(str->vrtx, 0,N*sizeof(G3Xpoint));
@@ -147,6 +148,7 @@ calculateNormPara(str);
 
 void DrawPara(Shape * str){
 /*	calculateNormPara(str);*/
+	N=(int)N/(str->detail);
 	int i,j,k,l;
 	i=0;
 	j=0;

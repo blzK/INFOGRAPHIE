@@ -1,6 +1,8 @@
 
 int N =200;
-#define P 200
+int  P =200;
+#define N_default 200
+#define P_default 200
 #define T 1
 #define U 50
 
